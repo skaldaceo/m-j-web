@@ -730,7 +730,6 @@ if (btnRegistrovat) {
 
   // 2. Uložení doplňujících údajů do tabulky fakturacni_udaje
   const { error: dbError } = await supabaseClient.from('fakturacni_udaje')
-    .from('fakturacni_udaje')
     .insert([
       {
         user_id: authData.user.id,
