@@ -826,6 +826,96 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateUserProfileNav(user);
   }
 });
+// --- LOGIKA PŘIHLAŠOVÁNÍ A SPRÁVY RELACE ---
+
+async function updateUserProfileNav(user) {
+  const profileTextEl = document.getElementById('nav-profile-text');
+  if (!profileTextEl) return;
+
+  if (user) {
+    const { data, error } = await supabaseClient
+      .from('fakturacni_udaje')
+      .select('jmeno')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data && data.jmeno) {
+      profileTextEl.innerText = data.jmeno;
+    } else {
+      profileTextEl.innerText = 'Můj účet';
+    }
+  } else {
+    profileTextEl.innerText = 'Profil';
+  }
+}
+
+const btnPrihlasit = document.getElementById('btn-prihlasit');
+if (btnPrihlasit) {
+  btnPrihlasit.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+      alert('Vyplňte prosím e-mail i heslo.');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) throw error;
+
+      await updateUserProfileNav(data.user);
+      alert('Přihlášení proběhlo úspěšně!');
+
+      if (typeof closeAuthModal === 'function') {
+        closeAuthModal();
+      }
+    } catch (err) {
+      console.error('Chyba při přihlášení:', err);
+      alert('Chyba při přihlášení: ' + err.message);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (user) {
+    updateUserProfileNav(user);
+  }
+});
+
+// --- LOGIKA PRO ZAPOMENUTÉ HESLO ---
+const btnForgotPassword = document.getElementById('btn-forgot-password');
+if (btnForgotPassword) {
+  btnForgotPassword.addEventListener('click', async () => {
+    const emailInput = document.getElementById('login-email');
+    const email = emailInput ? emailInput.value.trim() : '';
+
+    if (!email) {
+      alert('Nejprve zadejte svůj e-mail do přihlašovacího políčka výše.');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href,
+      });
+
+      if (error) throw error;
+
+      alert('Odkaz pro obnovení hesla byl odeslán na e-mail: ' + email);
+    } catch (err) {
+      console.error('Chyba při obnově hesla:', err);
+      alert('Chyba: ' + err.message);
+    }
+  });
+}
 </script>
 </body>
 </html>
