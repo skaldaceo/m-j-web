@@ -850,40 +850,6 @@ async function updateUserProfileNav(user) {
   }
 }
 
-const btnPrihlasit = document.getElementById('btn-prihlasit');
-if (btnPrihlasit) {
-  btnPrihlasit.addEventListener('click', async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-
-    if (!email || !password) {
-      alert('Vyplňte prosím e-mail i heslo.');
-      return;
-    }
-
-    try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) throw error;
-
-      await updateUserProfileNav(data.user);
-      alert('Přihlášení proběhlo úspěšně!');
-
-      if (typeof closeAuthModal === 'function') {
-        closeAuthModal();
-      }
-    } catch (err) {
-      console.error('Chyba při přihlášení:', err);
-      alert('Chyba při přihlášení: ' + err.message);
-    }
-  });
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
