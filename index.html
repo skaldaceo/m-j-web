@@ -647,7 +647,7 @@
         }
 
         function validateCity() {
-            const cityInput = document.getElementById('city');
+            const cityInput = document.getElementById('reg-mesto') || document.getElementById('city');
             const status = document.getElementById('city-status');
             if(cityInput.value.length > 2) {
                 status.classList.remove('hidden');
