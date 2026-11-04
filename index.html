@@ -810,9 +810,11 @@ if (btnPrihlasit) {
       alert('Přihlášení proběhlo úspěšně!');
 
       // Zavření modálního okna přihlášení (pokud máte funkci pro zavření)
-      if (typeof closeAuthModal === 'function') {
-        closeAuthModal();
-      }
+      if (typeof closeModals === 'function') {
+        closeModals();
+    } else {
+        window.location.reload(); 
+    }
     } catch (err) {
       console.error('Chyba při přihlášení:', err);
       alert('Chyba při přihlášení: ' + err.message);
