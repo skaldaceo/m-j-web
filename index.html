@@ -698,7 +698,9 @@
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
   // Zpracování kliknutí na tlačítko registrace
-  document.getElementById('btn-registrovat').addEventListener('click', async (e) => {
+  const btnRegistrovat = document.getElementById('btn-registrovat');
+if (btnRegistrovat) {
+  btnRegistrovat.addEventListener('click', async (e) => {
     e.preventDefault(); // Zabrání nechtěnému znovunačtení stránky
 
     // Načtení dat z HTML polí
