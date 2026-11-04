@@ -419,10 +419,10 @@
                 <div>
                     <h4 class="text-cyan-400 font-semibold mb-3 border-b border-gray-800 pb-1">Přihlašovací údaje</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><input type="text" placeholder="Jméno" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
-                        <div><input type="text" placeholder="Příjmení" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
-                        <div class="md:col-span-2"><input type="email" placeholder="E-mail" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
-                        <div class="md:col-span-2"><input type="tel" placeholder="Telefon" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div><input type="text" id="reg-jmeno" placeholder="Jméno" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div><input type="text" id="reg-prijmeni" placeholder="Příjmení" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div class="md:col-span-2"><input type="email" id="reg-email" placeholder="E-mail" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div class="md:col-span-2"><input type="tel" id="reg-telefon" placeholder="Telefon" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
                         
                         <!-- Heslo s validací -->
                         <div>
@@ -440,8 +440,8 @@
                 <div>
                     <h4 class="text-cyan-400 font-semibold mb-3 border-b border-gray-800 pb-1">Fakturační údaje</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2"><input type="text" placeholder="Jméno a Příjmení / Firma" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
-                        <div class="md:col-span-2"><input type="text" placeholder="Ulice a číslo popisné" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div class="md:col-span-2"><input type="text" id="reg-firma" placeholder="Jméno a Příjmení / Firma" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div class="md:col-span-2"><input type="text" id="reg-ulice" placeholder="Ulice a číslo popisné" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
                         
                         <!-- Země a Město s ověřením -->
                         <div>
@@ -452,7 +452,7 @@
                                 <option value="AT">Rakousko</option>
                             </select>
                         </div>
-                        <div><input type="text" placeholder="PSČ" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
+                        <div><input type="text" id="reg-psc"placeholder="PSČ" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none"></div>
                         <div class="md:col-span-2 relative">
                             <input type="text" id="city" onblur="validateCity()" placeholder="Město" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2 px-3 text-white focus:border-cyan-400 focus:outline-none">
                             <p id="city-status" class="text-xs text-cyan-500 mt-1 hidden"><i class="fa-solid fa-spinner fa-spin"></i> Ověřuji lokaci...</p>
@@ -680,5 +680,69 @@
             setTimeout(closeModals, 1500);
         }
     </script>
+<!-- Načtení knihovny Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<!-- Skript pro zpracování registrace -->
+<script>
+  // Inicializace Supabase s vašimi klíči
+  const supabaseUrl = 'https://rtqujirvdyzkdmxzvvfa.supabase.co';
+  const supabaseKey = 'sb_publishable_OBjCg-l66656Z0CLFqQ7jw_4QoqgaZB';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  // Zpracování kliknutí na tlačítko registrace
+  document.getElementById('btn-registrovat').addEventListener('click', async (e) => {
+    e.preventDefault(); // Zabrání nechtěnému znovunačtení stránky
+
+    // Načtení dat z HTML polí
+    const email = document.getElementById('reg-email').value;
+    const heslo = document.getElementById('reg-pwd').value;
+    const telefon = document.getElementById('reg-telefon').value;
+    const firma = document.getElementById('reg-firma').value;
+    const ulice = document.getElementById('reg-ulice').value;
+    const PSČ = document.getElementById('reg-psc').value;
+    const jmeno = document.getElementById('reg-jmeno').value;
+    const prijmeni = document.getElementById('reg-prijmeni').value;
+// //Případně i pole z fakturačních údajů:
+    const mesto = document.getElementById('reg-mesto').value;
+    
+    // Sem případně doplňte načítání dalších polí (město, PSČ...)
+
+    try {
+      // 1. Vytvoření uživatelského účtu v sekci Authentication
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: heslo,
+      });
+
+      if (authError) throw authError;
+
+      // 2. Uložení doplňujících údajů do tabulky fakturacni_udaje
+      const { error: dbError } = await supabase
+        .from('fakturacni_udaje') // Název vaší tabulky
+        .insert([
+          { 
+            user_id: authData.user.id,
+            jmeno: jmeno,
+            prijmeni: prijmeni,
+            firma: firma,
+            ulice: ulice,
+            mesto: mesto,
+            psc: PSC,
+            telefon: telefon,
+            email: email
+          }
+        ]);
+
+      if (dbError) throw dbError;
+
+      alert('Registrace proběhla úspěšně!');
+      
+    } catch (error) {
+      console.error('Chyba při registraci:', error.message);
+      alert('Nastala chyba: ' + error.message);
+    }
+  });
+</script>
 </body>
 </html>
