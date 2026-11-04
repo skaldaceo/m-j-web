@@ -717,41 +717,41 @@
     
     // Sem případně doplňte načítání dalších polí (město, PSČ...)
 
-    try {
-      // 1. Vytvoření uživatelského účtu v sekci Authentication
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
-        password: heslo,
-      });
-
-      if (authError) throw authError;
-
-      // 2. Uložení doplňujících údajů do tabulky fakturacni_udaje
-      const { error: dbError } = await supabase
-        .from('fakturacni_udaje') // Název vaší tabulky
-        .insert([
-          { 
-            user_id: authData.user.id,
-            jmeno: jmeno,
-            prijmeni: prijmeni,
-            firma: firma,
-            ulice: ulice,
-            mesto: mesto,
-            psc: psc,
-            telefon: telefon,
-            email: email
-          }
-        ]);
-
-      if (dbError) throw dbError;
-
-      alert('Registrace proběhla úspěšně!');
-      
-    } catch (error) {
-      console.error('Chyba při registraci:', error.message);
-      alert('Nastala chyba: ' + error.message);
-    }
+   try {
+  // 1. Vytvoření uživatelského účtu v sekci Authentication
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: email,
+    password: heslo,
   });
+
+  if (authError) throw authError;
+
+  // 2. Uložení doplňujících údajů do tabulky fakturacni_udaje
+  const { error: dbError } = await supabase
+    .from('fakturacni_udaje')
+    .insert([
+      {
+        user_id: authData.user.id,
+        jmeno: jmeno,
+        prijmeni: prijmeni,
+        firma: firma,
+        ulice: ulice,
+        mesto: mesto,
+        psc: psc,
+        telefon: telefon,
+        email: email
+      }
+    ]);
+
+  // DŮLEŽITÉ: Kontrola chyby databáze
+  if (dbError) throw dbError;
+
+  alert('Registrace proběhla úspěšně!');
+
+} catch (err) {
+  console.error('Chyba při registraci:', err);
+  alert('Chyba při registraci: ' + err.message);
+}
 </script>
 </body>
 </html>
