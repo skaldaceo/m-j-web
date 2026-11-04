@@ -755,6 +755,77 @@ if (btnRegistrovat) {
    }
 });
 }
+// --- LOGIKA PŘIHLAŠOVÁNÍ A SPRÁVY RELACE ---
+
+// Funkce pro aktualizaci jména v navigaci
+async function updateUserProfileNav(user) {
+  const profileTextEl = document.getElementById('nav-profile-text'); // Upravte ID dle vašeho HTML
+  if (!profileTextEl) return;
+
+  if (user) {
+    // Načteme jméno přihlášeného uživatele z tabulky fakturacni_udaje
+    const { data, error } = await supabaseClient
+      .from('fakturacni_udaje')
+      .select('jmeno')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data && data.jmeno) {
+      profileTextEl.innerText = data.jmeno;
+    } else {
+      profileTextEl.innerText = 'Můj účet';
+    }
+  } else {
+    profileTextEl.innerText = 'Profil';
+  }
+}
+
+// 1. Přihlášení uživatele po kliknutí na tlačítko
+const btnPrihlasit = document.getElementById('btn-prihlasit');
+if (btnPrihlasit) {
+  btnPrihlasit.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+      alert('Vyplňte prosím e-mail i heslo.');
+      return;
+    }
+
+    try {
+      // Přihlášení přes Supabase Auth
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) throw error;
+
+      // Načtení jména a aktualizace navigace
+      await updateUserProfileNav(data.user);
+
+      alert('Přihlášení proběhlo úspěšně!');
+
+      // Zavření modálního okna přihlášení (pokud máte funkci pro zavření)
+      if (typeof closeAuthModal === 'function') {
+        closeAuthModal();
+      }
+    } catch (err) {
+      console.error('Chyba při přihlášení:', err);
+      alert('Chyba při přihlášení: ' + err.message);
+    }
+  });
+}
+
+// 2. Automatické zachování přihlášení po načtení / obnovení stránky
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (user) {
+    updateUserProfileNav(user);
+  }
+});
 </script>
 </body>
 </html>
