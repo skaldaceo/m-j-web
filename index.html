@@ -408,6 +408,40 @@
 
     <!-- MODÁLNÍ OKNA PRO PROFIL (Přihlášení / Registrace) -->
     
+    <!-- MODÁLNÍ OKNO PRO NÁKUPNÍ KOŠÍK -->
+<div id="cartModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
+    <div class="bg-[#1a1d24] w-full max-w-lg rounded-2xl border border-gray-700 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        
+        <!-- Hlavička košíku -->
+        <div class="p-5 border-b border-gray-800 flex justify-between items-center bg-[#181d24]">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-cart-shopping text-cyan-400 text-xl"></i>
+                <h3 class="text-xl font-bold text-white">Váš nákupní košík</h3>
+            </div>
+            <button onclick="closeCartModal()" class="text-gray-400 hover:text-white text-xl focus:outline-none">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Seznam položek v košíku -->
+        <div id="cart-items-container" class="p-5 overflow-y-auto flex-1 space-y-4">
+            <!-- Sem JS dynamicky vykreslí produkty -->
+        </div>
+
+        <!-- Patka s celkovou cenou a tlačítkem -->
+        <div class="p-5 border-t border-gray-800 bg-[#181d24] space-y-4">
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-400">Celková cena:</span>
+                <span id="cart-total-price" class="text-2xl font-bold text-cyan-400">0 Kč</span>
+            </div>
+            
+            <button class="w-full bg-cyan-400 hover:bg-cyan-300 text-gray-900 font-bold py-3 rounded-xl transition-colors shadow-lg shadow-cyan-500/10">
+                Pokračovat k objednávce
+            </button>
+        </div>
+    </div>
+</div>
+    
     <!-- Backdrop pro okna -->
     <div id="modalBackdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
         
