@@ -93,8 +93,8 @@
 
                 <!-- Ikony a akce -->
                 <div class="flex items-center space-x-6">
-                    <button onclick="openModal('loginModal')" class="text-gray-300 hover:text-cyan-400 transition-colors flex flex-col items-center">
-                        <i class="fa-regular fa-user text-xl"></i>
+                    <button onclick="handleProfileClick()" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors flex flex-col items-center">
+                    <i class="fa-regular fa-user text-xl"></i>
                         <span id="nav-profile-text" class="text-[10px] mt-1 hidden md:block">Profil</span>
                     </button>
                     <!-- Košík s číslem vpravo dole -->
@@ -756,7 +756,28 @@ if (btnRegistrovat) {
    }
 });
 }
-// --- LOGIKA PŘIHLAŠOVÁNÍ A SPRÁVY RELACE ---
+<!-- Profilové okno po kliknutí na jméno -->
+<div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden">
+    <div class="bg-[#181d24] text-white p-6 rounded-xl w-full max-w-md relative border border-gray-800 shadow-2xl">
+        <!-- Křížek pro zavření -->
+        <button onclick="closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">✕</button>
+        
+        <!-- Jméno a e-mail -->
+        <div class="text-center mb-6 border-b border-gray-800 pb-4">
+            <h3 id="profile-modal-name" class="text-xl font-bold">Načítám...</h3>
+            <p id="profile-modal-email" class="text-sm text-gray-400 mt-1">načítám...</p>
+        </div>
+        
+        <!-- Rozcestník pod sebou -->
+        <div class="flex flex-col space-y-3">
+            <a href="#objednavky" onclick="closeModals()" class="bg-[#1f2630] hover:bg-[#252e3b] p-3 rounded-lg text-center font-medium transition-colors border border-gray-800/50">Objednávky</a>
+            <a href="#faktury" onclick="closeModals()" class="bg-[#1f2630] hover:bg-[#252e3b] p-3 rounded-lg text-center font-medium transition-colors border border-gray-800/50">Faktury</a>
+            <a href="#reklamace" onclick="closeModals()" class="bg-[#1f2630] hover:bg-[#252e3b] p-3 rounded-lg text-center font-medium transition-colors border border-gray-800/50">Reklamace/Servis</a>
+            <a href="#registracni-udaje" onclick="closeModals()" class="bg-[#1f2630] hover:bg-[#252e3b] p-3 rounded-lg text-center font-medium transition-colors border border-gray-800/50">Registrační údaje</a>
+        </div>
+    </div>
+</div>
+    // --- LOGIKA PŘIHLAŠOVÁNÍ A SPRÁVY RELACE ---
 
 // Funkce pro aktualizaci jména v navigaci
 async function updateUserProfileNav(user) {
@@ -880,6 +901,38 @@ if (btnForgotPassword) {
       alert('Chyba: ' + err.message);
     }
   });
+}
+// Inteligentní kliknutí na profil v navigaci
+async function handleProfileClick() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    
+    if (user) {
+        // Uživatel JE přihlášen -> otevřeme profilové okno a natáhneme data
+        openModal('profileModal');
+        loadUserProfileModal(user);
+    } else {
+        // Uživatel NENÍ přihlášen -> otevřeme klasické přihlášení
+        openModal('loginModal');
+    }
+}
+
+// Načtení údajů do profilového okna
+async function loadUserProfileModal(user) {
+    document.getElementById('profile-modal-email').textContent = user.email;
+    
+    // Zjistíme jméno a příjmení z tabulki fakturacni_udaje
+    const { data, error } = await supabaseClient
+        .from('fakturacni_udaje')
+        .select('jmeno, prijmeni')
+        .eq('user_id', user.id)
+        .single();
+        
+    if (data) {
+        const fullName = `${data.jmeno || ''} ${data.prijmeni || ''}`.trim();
+        document.getElementById('profile-modal-name').textContent = fullName || 'Zákazník';
+    } else {
+        document.getElementById('profile-modal-name').textContent = 'Zákazník';
+    }
 }
 </script>
 </body>
