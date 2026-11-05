@@ -93,10 +93,31 @@
 
                 <!-- Ikony a akce -->
                 <div class="flex items-center space-x-6">
-                    <button onclick="handleProfileClick()" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors flex flex-col items-center">
-                    <i class="fa-regular fa-user text-xl"></i>
-                        <span id="nav-profile-text" class="text-[10px] mt-1 hidden md:block">Profil</span>
-                    </button>
+                    
+                    <!-- Tlačítko Profilu s rozevíracím zákaznickým menu -->
+<div class="relative">
+    <button onclick="handleProfileClick()" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors flex flex-col items-center focus:outline-none">
+        <i class="fa-regular fa-user text-xl"></i>
+        <span id="nav-profile-text" class="text-[10px] mt-1 hidden md:block">Profil</span>
+    </button>
+
+    <!-- Rozevírací nabídka přímo pod tlačítkem -->
+    <div id="profileDropdown" class="absolute right-0 mt-3 w-60 bg-[#181d24] border border-gray-800 rounded-xl shadow-2xl py-3 px-4 hidden z-50">
+        <!-- Jméno a e-mail -->
+        <div class="border-b border-gray-800 pb-3 mb-2 text-left">
+            <div id="profile-dropdown-name" class="font-bold text-white text-base truncate">Načítám...</div>
+            <div id="profile-dropdown-email" class="text-xs text-gray-400 truncate">načítám...</div>
+        </div>
+
+        <!-- Položky nabídky -->
+        <div class="flex flex-col space-y-1 text-sm text-left">
+            <a href="#objednavky" onclick="toggleProfileDropdown()" class="px-3 py-2 rounded-lg text-gray-300 hover:bg-[#252e3b] hover:text-white transition-colors">Objednávky</a>
+            <a href="#faktury" onclick="toggleProfileDropdown()" class="px-3 py-2 rounded-lg text-gray-300 hover:bg-[#252e3b] hover:text-white transition-colors">Faktury</a>
+            <a href="#reklamace" onclick="toggleProfileDropdown()" class="px-3 py-2 rounded-lg text-gray-300 hover:bg-[#252e3b] hover:text-white transition-colors">Reklamace / Servis</a>
+            <a href="#registracni-udaje" onclick="toggleProfileDropdown()" class="px-3 py-2 rounded-lg text-gray-300 hover:bg-[#252e3b] hover:text-white transition-colors">Registrační údaje</a>
+        </div>
+    </div>
+</div>
                     <!-- Košík s číslem vpravo dole -->
                     <button id="cart-btn" class="text-gray-300 hover:text-cyan-400 transition-colors relative flex flex-col items-center group">
                         <div class="relative">
@@ -384,18 +405,6 @@
     
     <!-- Backdrop pro okna -->
     <div id="modalBackdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
-        
-        <!-- Profilové okno po kliknutí na jméno -->
-<div id="profileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden">
-    <div class="bg-[#181d24] text-white p-6 rounded-xl w-full max-w-md relative border border-gray-800 shadow-2xl">
-        <!-- Křížek pro zavření -->
-        <button onclick="closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">✕</button>
-        
-        <!-- Jméno a e-mail -->
-        <div class="text-center mb-6 border-b border-gray-800 pb-4">
-            <h3 id="profile-modal-name" class="text-xl font-bold">Načítám...</h3>
-            <p id="profile-modal-email" class="text-sm text-gray-400 mt-1">načítám...</p>
-        </div>
         
         <!-- Rozcestník pod sebou -->
         <div class="flex flex-col space-y-3">
@@ -902,38 +911,58 @@ if (btnForgotPassword) {
     }
   });
 }
-// Inteligentní kliknutí na profil v navigaci
+// Inteligentní kliknutí na profil v navigaci (vyjetí menu / přihlášení)
 async function handleProfileClick() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     
     if (user) {
-        // Uživatel JE přihlášen -> otevřeme profilové okno a natáhneme data
-        openModal('profileModal');
-        loadUserProfileModal(user);
+        const dropdown = document.getElementById('profileDropdown');
+        await loadUserProfileDropdown(user);
+        dropdown.classList.toggle('hidden');
     } else {
-        // Uživatel NENÍ přihlášen -> otevřeme klasické přihlášení
         openModal('loginModal');
     }
 }
 
-// Načtení údajů do profilového okna
-async function loadUserProfileModal(user) {
-    document.getElementById('profile-modal-email').textContent = user.email;
+// Zavření rozbalovacího menu
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+}
+
+// Načtení jména a e-mailu do nabídky
+async function loadUserProfileDropdown(user) {
+    const emailEl = document.getElementById('profile-dropdown-email');
+    const nameEl = document.getElementById('profile-dropdown-name');
+    if (emailEl) emailEl.textContent = user.email;
     
-    // Zjistíme jméno a příjmení z tabulki fakturacni_udaje
-    const { data, error } = await supabaseClient
+    const { data } = await supabaseClient
         .from('fakturacni_udaje')
         .select('jmeno, prijmeni')
         .eq('user_id', user.id)
         .single();
         
-    if (data) {
-        const fullName = `${data.jmeno || ''} ${data.prijmeni || ''}`.trim();
-        document.getElementById('profile-modal-name').textContent = fullName || 'Zákazník';
-    } else {
-        document.getElementById('profile-modal-name').textContent = 'Zákazník';
+    if (nameEl) {
+        if (data) {
+            const fullName = `${data.jmeno || ''} ${data.prijmeni || ''}`.trim();
+            nameEl.textContent = fullName || 'Zákazník';
+        } else {
+            nameEl.textContent = 'Zákazník';
+        }
     }
 }
+
+// Zavření nabídky při kliknutí kamkoliv mimo menu
+window.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('profileDropdown');
+    const profileBtn = document.getElementById('nav-profile-text')?.parentElement;
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!profileBtn?.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    }
+});
+    
 </script>
 </body>
 </html>
