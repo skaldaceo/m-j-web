@@ -999,38 +999,36 @@ async function handleLogout() {
     await supabaseClient.auth.signOut();
     window.location.reload();
 }
-// Načtení košíku z paměti prohlížeče
-let cart = JSON.parse(localStorage.getItem('simplefit_cart')) || [];
+// Načtení košíku s automatickým vyčištěním poškozených dat
+let cart = [];
+try {
+    const saved = localStorage.getItem('simplefit_cart');
+    cart = saved ? JSON.parse(saved).filter(item => item && item.id && typeof item.price === 'number') : [];
+} catch(e) {
+    cart = [];
+}
 
-// Uložení košíku a aktualizace UI
 function saveAndRenderCart() {
     localStorage.setItem('simplefit_cart', JSON.stringify(cart));
     renderCart();
 }
 
-// Funkce pro přidání produktu do košíku
+// Přidání produktu (s kontrolou platnosti dat)
 function addToCart(id, name, price, image) {
-    const existingItem = cart.find(item => item.id === id);
+    if (!id || typeof price !== 'number') return;
     
+    const existingItem = cart.find(item => item.id === id);
     if (existingItem) {
-        // Pokud produkt v košíku už je -> pouze navýšíme množství
         existingItem.quantity += 1;
     } else {
-        // Pokud v košíku není -> přidáme nový řádek s 1 ks
-        cart.push({
-            id: id,
-            name: name,
-            price: price,
-            image: image,
-            quantity: 1
-        });
+        cart.push({ id: id, name: name, price: price, image: image || 'logo.jpeg', quantity: 1 });
     }
     
     saveAndRenderCart();
-    openCartModal(); // Rovnou otevřeme košík pro kontrolu
+    openCartModal();
 }
 
-// Změna množství kusu (+1 nebo -1)
+// Změna množství (+1 / -1)
 function updateQuantity(id, change) {
     const item = cart.find(i => i.id === id);
     if (!item) return;
@@ -1044,26 +1042,34 @@ function updateQuantity(id, change) {
     saveAndRenderCart();
 }
 
-// Smazání položky z košíku
+// Odstranění položky
 function removeFromCart(id) {
     cart = cart.filter(item => item.id !== id);
     saveAndRenderCart();
 }
 
-// Vykreslení košíku a přepočet cen
+// Vykreslení košíku a aktualizace červené kuličky
 function renderCart() {
     const container = document.getElementById('cart-items-container');
     const totalPriceEl = document.getElementById('cart-total-price');
     const cartCountEl = document.getElementById('cart-count');
 
-    // Počet položek pro červenou ikonku v liště
-    const totalItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    // Bezpečný filtr platných položek
+    cart = cart.filter(item => item && typeof item.price === 'number');
+
+    // Aktualizace červené kuličky u košíku v navigaci
+    const totalItemsCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     if (cartCountEl) {
         cartCountEl.textContent = totalItemsCount;
-        cartCountEl.classList.toggle('hidden', totalItemsCount === 0);
+        if (totalItemsCount > 0) {
+            cartCountEl.classList.remove('hidden');
+        } else {
+            cartCountEl.classList.add('hidden');
+        }
     }
 
-    // Pokud je košík prázdný
+    if (!container) return;
+
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="text-center py-10 text-gray-400">
@@ -1071,33 +1077,27 @@ function renderCart() {
                 Váš košík je zatím prázdný.
             </div>
         `;
-        totalPriceEl.textContent = '0 Kč';
+        if (totalPriceEl) totalPriceEl.textContent = '0 Kč';
         return;
     }
 
-    // Vykreslení jednotlivých řádků produktů
     let totalPrice = 0;
     container.innerHTML = cart.map(item => {
         const itemTotal = item.price * item.quantity;
         totalPrice += itemTotal;
-        
-        // Je tlačítko "-" zablokované (při 1 ks)?
         const isMinusDisabled = item.quantity <= 1;
 
         return `
-            <div class="flex items-center justify-between bg-[#181d24] p-3 rounded-xl border border-gray-800/80 space-x-3">
-                <!-- Obrázek -->
-                <img src="${item.image}" alt="${item.name}" class="w-14 h-14 object-cover rounded-lg bg-gray-900 border border-gray-800">
+            <div class="flex items-center justify-between bg-[#181d24] p-3 rounded-xl border border-gray-800 space-x-3">
+                <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded-lg bg-gray-900 border border-gray-800">
 
-                <!-- Název a cena za 1 ks -->
                 <div class="flex-1 min-w-0">
                     <h4 class="font-bold text-white text-sm truncate">${item.name}</h4>
                     <div class="text-xs text-cyan-400 font-medium">${item.price.toLocaleString('cs-CZ')} Kč / ks</div>
                 </div>
 
-                <!-- Ovládání množství (+ / - / ks) -->
                 <div class="flex items-center space-x-2 bg-gray-900/80 px-2 py-1 rounded-lg border border-gray-800">
-                    <button onclick="updateQuantity('${item.id}', -1)" 
+                    <button type="button" onclick="updateQuantity('${item.id}', -1)" 
                             ${isMinusDisabled ? 'disabled' : ''} 
                             class="w-6 h-6 flex items-center justify-center rounded font-bold transition-colors ${
                                 isMinusDisabled 
@@ -1109,16 +1109,15 @@ function renderCart() {
                     
                     <span class="text-xs font-bold text-white min-w-[32px] text-center">${item.quantity} ks</span>
 
-                    <button onclick="updateQuantity('${item.id}', 1)" 
+                    <button type="button" onclick="updateQuantity('${item.id}', 1)" 
                             class="w-6 h-6 flex items-center justify-center rounded text-gray-300 hover:bg-gray-800 hover:text-white font-bold transition-colors">
                         +
                     </button>
                 </div>
 
-                <!-- Celková cena za daný produkt & smazání -->
-                <div class="text-right">
+                <div class="text-right min-w-[70px]">
                     <div class="font-bold text-white text-sm">${itemTotal.toLocaleString('cs-CZ')} Kč</div>
-                    <button onclick="removeFromCart('${item.id}')" class="text-xs text-gray-500 hover:text-red-400 transition-colors mt-1">
+                    <button type="button" onclick="removeFromCart('${item.id}')" class="text-xs text-gray-500 hover:text-red-400 transition-colors mt-1">
                         <i class="fa-regular fa-trash-can"></i>
                     </button>
                 </div>
@@ -1126,21 +1125,19 @@ function renderCart() {
         `;
     }).join('');
 
-    // Nastavení celkové ceny
-    totalPriceEl.textContent = `${totalPrice.toLocaleString('cs-CZ')} Kč`;
+    if (totalPriceEl) totalPriceEl.textContent = `${totalPrice.toLocaleString('cs-CZ')} Kč`;
 }
 
-// Otevření a zavření okna košíku
+// Funkce otevření a zavření
 function openCartModal() {
     renderCart();
-    document.getElementById('cartModal').classList.remove('hidden');
+    document.getElementById('cartModal')?.classList.remove('hidden');
 }
 
 function closeCartModal() {
-    document.getElementById('cartModal').classList.add('hidden');
+    document.getElementById('cartModal')?.classList.add('hidden');
 }
 
-// Inicializace při prvním načtení stránky
 document.addEventListener('DOMContentLoaded', renderCart);
 
 </script>
