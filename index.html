@@ -124,13 +124,13 @@
     </div>
 </div>
                     <!-- Košík s číslem vpravo dole -->
-                    <button id="cart-btn" class="text-gray-300 hover:text-cyan-400 transition-colors relative flex flex-col items-center group">
-                        <div class="relative">
-                            <i class="fa-solid fa-cart-shopping text-xl"></i>
-                            <span id="cart-count" class="absolute -bottom-1 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_8px_rgba(220,38,38,0.8)] opacity-0 transition-opacity duration-300">0</span>
-                        </div>
-                        <span class="text-[10px] mt-1 hidden md:block">Košík</span>
-                    </button>
+                    <button id="cart-btn" onclick="openCartModal()" class="text-gray-300 hover:text-cyan-400 transition-colors relative flex flex-col items-center focus:outline-none">
+    <div class="relative">
+        <i class="fa-solid fa-cart-shopping text-xl"></i>
+        <span id="cart-count" class="absolute -bottom-1 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+    </div>
+    <span class="text-[10px] mt-1 hidden md:block">Košík</span>
+</button>
                     <!-- Hamburger (Mobil) -->
                     <button class="md:hidden text-gray-300 hover:text-cyan-400">
                         <i class="fa-solid fa-bars text-2xl"></i>
