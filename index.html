@@ -968,6 +968,12 @@ window.addEventListener('click', function(e) {
     }
 });
     
+// Tiché odhlášení bez hlášky a restart do původního stavu
+async function handleLogout() {
+    toggleProfileDropdown();
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+}
 </script>
 </body>
 </html>
