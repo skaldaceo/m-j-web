@@ -1378,8 +1378,24 @@ const zasilkovnaPointsData = [
 
 // Otevření a zavření modálu Zásilkovny
 function openZasilkovnaModal() {
-    document.getElementById('zasilkovnaModal')?.classList.remove('hidden');
-    renderZasilkovnaPointsList();
+    const packetaOptions = {
+        country: "cz",
+        language: "cs"
+    };
+
+    Packeta.Widget.pick("YOUR_API_KEY", function(point) {
+        if (point) {
+            selectedZasilkovnaPoint = `${point.name}, ${point.street}`;
+            
+            const labelEl = document.getElementById('selected-zasilkovna-text');
+            if (labelEl) {
+                labelEl.textContent = `Vybráno: ${selectedZasilkovnaPoint}`;
+                labelEl.className = 'text-xs text-cyan-400 font-bold mt-0.5';
+            }
+            
+            updateCheckoutTotals();
+        }
+    }, packetaOptions);
 }
 
 function closeZasilkovnaModal() {
