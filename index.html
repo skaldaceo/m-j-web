@@ -1363,15 +1363,102 @@ function handleShippingChange() {
     }
     updateCheckoutTotals();
 }
+let currentZFilter = 'all';
 
-// Simulace / Propojení widgetu Zásilkovny
-function openZasilkovnaWidget() {
-    const mockPoint = prompt("Zadejte vaše město pro vyhledání Z-BOXu / výdejny (např. Praha 11):", "Praha 11 - Háje");
-    if (mockPoint) {
-        selectedZasilkovnaPoint = `Z-BOX ${mockPoint}, Hlavní 123`;
-        document.getElementById('selected-zasilkovna-text').textContent = `Vybráno: ${selectedZasilkovnaPoint}`;
-        document.getElementById('selected-zasilkovna-text').className = 'text-xs text-cyan-400 font-bold';
+// Databáze odběrných míst pro vyhledávač
+const zasilkovnaPointsData = [
+    { id: 'z1', name: 'Z-BOX Praha 11, Sulanského 695/4', type: 'box', address: 'Sulanského 695/4, Praha 11 - Háje', query: 'Sulanskeho%20695/4%20Praha' },
+    { id: 'z2', name: 'Zásilkovna Praha 11, Kosmonautů (Trafika)', type: 'point', address: 'Kosmonautů 418, Praha 11 - Háje', query: 'Kosmonautu%20418%20Praha' },
+    { id: 'z3', name: 'Z-BOX Praha 11, Opatovská (Metro Opatov)', type: 'box', address: 'Opatovská 874, Praha 11 - Opatov', query: 'Opatovska%20874%20Praha' },
+    { id: 'z4', name: 'Z-BOX Praha 4, Chodov (Westfield Chodov)', type: 'box', address: 'Roztylská 2321/19, Praha 4 - Chodov', query: 'Roztylska%202321%20Praha' },
+    { id: 'z5', name: 'Zásilkovna Praha 8, Bohnice (Traficon)', type: 'point', address: 'Zhořelecká 514/2, Praha 8 - Bohnice', query: 'Zhorelecka%20514%20Praha' },
+    { id: 'z6', name: 'Z-BOX Praha 8, Cafourkova', type: 'box', address: 'Cafourkova 520/1, Praha 8 - Bohnice', query: 'Cafourkova%20520%20Praha' }
+];
+
+// Otevření a zavření modálu Zásilkovny
+function openZasilkovnaModal() {
+    document.getElementById('zasilkovnaModal')?.classList.remove('hidden');
+    renderZasilkovnaPointsList();
+}
+
+function closeZasilkovnaModal() {
+    document.getElementById('zasilkovnaModal')?.classList.add('hidden');
+}
+
+// Nastavení filtru (Vše / Jen Z-BOXy / Jen výdejní místa)
+function setZasilkovnaFilter(filterType) {
+    currentZFilter = filterType;
+    ['all', 'box', 'point'].forEach(f => {
+        const btn = document.getElementById(`z-filter-${f}`);
+        if (btn) {
+            if (f === filterType) {
+                btn.className = 'px-3 py-1 rounded-lg bg-cyan-400 text-gray-900 font-bold transition-all';
+            } else {
+                btn.className = 'px-3 py-1 rounded-lg bg-gray-800 text-gray-300 font-semibold hover:bg-gray-700 transition-all';
+            }
+        }
+    });
+    renderZasilkovnaPointsList();
+}
+
+// Vykreslení seznamu poboček podle hledání a filtru
+function renderZasilkovnaPointsList() {
+    const listEl = document.getElementById('zasilkovna-points-list');
+    const searchVal = document.getElementById('zasilkovna-search-input')?.value.toLowerCase().trim() || '';
+
+    if (!listEl) return;
+
+    const filtered = zasilkovnaPointsData.filter(item => {
+        const matchesFilter = currentZFilter === 'all' || item.type === currentZFilter;
+        const matchesSearch = item.name.toLowerCase().includes(searchVal) || item.address.toLowerCase().includes(searchVal);
+        return matchesFilter && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="text-center text-gray-400 py-8 text-xs">Žádné odběrné místo neodpovídá vyhledávání.</div>`;
+        return;
     }
+
+    listEl.innerHTML = filtered.map(item => `
+        <div class="bg-[#1a1d24] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/50 transition-all flex items-center justify-between gap-2 cursor-pointer" onclick="previewZasilkovnaMap('${item.query}')">
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-white">${item.name}</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${item.type === 'box' ? 'bg-red-500/20 text-red-400' : 'bg-cyan-500/20 text-cyan-400'}">
+                        ${item.type === 'box' ? 'Z-BOX' : 'Výdejna'}
+                    </span>
+                </div>
+                <div class="text-[11px] text-gray-400 mt-0.5">${item.address}</div>
+            </div>
+            <button type="button" onclick="selectZasilkovnaBranch('${item.name}')" class="bg-cyan-400 hover:bg-cyan-300 text-gray-900 text-xs font-extrabold px-3 py-1.5 rounded-lg transition-colors flex-shrink-0">
+                Vybrat
+            </button>
+        </div>
+    `).join('');
+}
+
+function filterZasilkovnaPoints() {
+    renderZasilkovnaPointsList();
+}
+
+// Náhled místa na mapě při kliknutí na řádek
+function previewZasilkovnaMap(query) {
+    const iframe = document.getElementById('zasilkovna-map-iframe');
+    if (iframe) {
+        iframe.src = `https://maps.google.com/maps?q=${query}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
+}
+
+// Výběr pobočky a uložení do pokladny
+function selectZasilkovnaBranch(branchName) {
+    selectedZasilkovnaPoint = branchName;
+    const labelEl = document.getElementById('selected-zasilkovna-text');
+    if (labelEl) {
+        labelEl.textContent = `Vybráno: ${branchName}`;
+        labelEl.className = 'text-xs text-cyan-400 font-bold mt-0.5';
+    }
+    closeZasilkovnaModal();
+    updateCheckoutTotals();
 }
 
 // Přepočet celkových cen v pravém panelu
@@ -1496,65 +1583,64 @@ document.addEventListener('DOMContentLoaded', renderCart);
                 <!-- KROK 2: DOPRAVA A PLATBA -->
                 <div id="checkout-step-2" class="space-y-6 hidden">
                     
-                    <!-- 1. Zvolte dopravu -->
-                    <div class="space-y-3">
-                        <h3 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="text-cyan-400">1.</span> Zvolte dopravu
-                        </h3>
+                  <!-- 1. Zvolte dopravu -->
+<div class="space-y-3">
+    <h3 class="text-base font-bold text-white flex items-center gap-2">
+        <span class="text-cyan-400">1.</span> Zvolte dopravu
+    </h3>
 
-                        <div class="space-y-2">
-                            <!-- Osobní odběr Praha 11 - Háje -->
-                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="shipping-option" value="pickup" checked onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
-                                        <div>
-                                            <div class="font-bold text-white text-sm">Osobní odběr (Prodejna / Sklad)</div>
-                                            <div class="text-xs text-gray-400">Šulanského 695/4, Praha 11 - Háje</div>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Zdarma</span>
-                                </div>
-                                
-                                <!-- Mini Google Mapa pro Háje -->
-                                <div id="pickup-map-box" class="mt-3 rounded-lg overflow-hidden border border-gray-800">
-                                    <iframe class="w-full h-36 border-0" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=Šulanského%20695/4,%20Praha%2011%20Háje&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
-                                </div>
-                            </label>
-
-                            <!-- Zásilkovna Výdejní místa & Boxy -->
-                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="shipping-option" value="zasilkovna-box" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
-                                        <div>
-                                            <div class="font-bold text-white text-sm">Zásilkovna – Výdejní místa a Z-BOXy</div>
-                                            <div id="selected-zasilkovna-text" class="text-xs text-gray-400">Vyberte výdejní místo na mapě...</div>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold text-cyan-400">89 Kč</span>
-                                </div>
-                                <button type="button" id="zasilkovna-select-btn" onclick="openZasilkovnaWidget()" class="mt-2 text-xs text-cyan-400 hover:underline flex items-center gap-1 font-semibold hidden">
-                                    <i class="fa-solid fa-map-location-dot"></i> Vybrat odběrné místo
-                                </button>
-                            </label>
-
-                            <!-- Zásilkovna Doručení na Adresu -->
-                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="shipping-option" value="zasilkovna-home" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
-                                        <div>
-                                            <div class="font-bold text-white text-sm">Zásilkovna – Doručení na adresu</div>
-                                            <div class="text-xs text-gray-400">Předvyplněno z uživatelského účtu</div>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold text-cyan-400">119 Kč</span>
-                                </div>
-                            </label>
-                        </div>
+    <div class="space-y-2">
+        <!-- Osobní odběr Praha 11 - Háje -->
+        <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <input type="radio" name="shipping-option" value="pickup" checked onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                    <div>
+                        <div class="font-bold text-white text-sm">Osobní odběr (Prodejna / Sklad)</div>
+                        <div class="text-xs text-cyan-400 font-semibold mt-0.5">Sulanského 695/4, Praha 11 - Háje</div>
                     </div>
+                </div>
+                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Zdarma</span>
+            </div>
+            
+            <!-- Mini Google Mapa pro Háje -->
+            <div id="pickup-map-box" class="mt-3 rounded-lg overflow-hidden border border-gray-800">
+                <iframe class="w-full h-36 border-0" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=Sulanského%20695/4,%20Praha%2011%20Háje&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+            </div>
+        </label>
 
+        <!-- Zásilkovna Výdejní místa & Boxy -->
+        <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <input type="radio" name="shipping-option" value="zasilkovna-box" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                    <div>
+                        <div class="font-bold text-white text-sm">Zásilkovna – Výdejní místa a Z-BOXy</div>
+                        <div id="selected-zasilkovna-text" class="text-xs text-gray-400 mt-0.5">Není vybráno žádné odběrné místo</div>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-cyan-400">89 Kč</span>
+            </div>
+            <button type="button" id="zasilkovna-select-btn" onclick="openZasilkovnaModal()" class="mt-2.5 text-xs bg-cyan-500/20 hover:bg-cyan-400 hover:text-gray-900 text-cyan-400 border border-cyan-500/30 font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hidden">
+                <i class="fa-solid fa-map-location-dot"></i> Vybrat odběrné místo na mapě
+            </button>
+        </label>
+
+        <!-- Zásilkovna Doručení na Adresu -->
+        <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <input type="radio" name="shipping-option" value="zasilkovna-home" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                    <div>
+                        <div class="font-bold text-white text-sm">Zásilkovna – Doručení na adresu</div>
+                        <div id="user-delivery-address-display" class="text-xs text-cyan-400 font-semibold mt-0.5">Doručit na: Sulanského 695/4, Praha 11 - Háje</div>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-cyan-400">119 Kč</span>
+            </div>
+        </label>
+    </div>
+</div>
                     <!-- 2. Zvolte platbu -->
                     <div class="space-y-3 pt-2">
                         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -1664,6 +1750,49 @@ document.addEventListener('DOMContentLoaded', renderCart);
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+<!-- MODÁLNÍ OKNO PRO VYHLEDÁVÁNÍ ODBĚRNÝCH MÍST ZÁSILKOVNY -->
+<div id="zasilkovnaModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[120] flex items-center justify-center hidden p-2 sm:p-4">
+    <div class="bg-[#1a1d24] border border-gray-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- Hlavička modálu Zásilkovny -->
+        <div class="p-4 bg-[#14171d] border-b border-gray-800 flex justify-between items-center">
+            <h3 class="font-bold text-white text-base flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-red-500"></i> Vyberte odběrné místo nebo Z-BOX
+            </h3>
+            <button type="button" onclick="closeZasilkovnaModal()" class="text-gray-400 hover:text-white text-xl font-bold px-2">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Vyhledávač a tlačítka filtrů -->
+        <div class="p-4 bg-[#181d24] border-b border-gray-800 space-y-3">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="text" id="zasilkovna-search-input" onkeyup="filterZasilkovnaPoints()" placeholder="Zadejte adresu, město nebo PSČ (např. Háje, Chodov, Bohnice)..." class="w-full bg-[#11141a] border border-gray-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+            
+            <div class="flex items-center gap-2 text-xs">
+                <span class="text-gray-400 font-semibold">Zobrazit:</span>
+                <button type="button" onclick="setZasilkovnaFilter('all')" id="z-filter-all" class="px-3 py-1 rounded-lg bg-cyan-400 text-gray-900 font-bold transition-all">Vše</button>
+                <button type="button" onclick="setZasilkovnaFilter('box')" id="z-filter-box" class="px-3 py-1 rounded-lg bg-gray-800 text-gray-300 font-semibold hover:bg-gray-700 transition-all">Jen Z-BOXy</button>
+                <button type="button" onclick="setZasilkovnaFilter('point')" id="z-filter-point" class="px-3 py-1 rounded-lg bg-gray-800 text-gray-300 font-semibold hover:bg-gray-700 transition-all">Jen výdejní místa</button>
+            </div>
+        </div>
+
+        <!-- Obsah: Seznam výdejen vlevo + Živá mapa vpravo -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden min-h-[380px]">
+            <!-- Seznam odběrných míst vlevo -->
+            <div id="zasilkovna-points-list" class="lg:col-span-6 p-4 space-y-2.5 overflow-y-auto max-h-[380px] bg-[#14171d]">
+                <!-- JS sem dynamicky podle vyhledávání vygeneruje seznam -->
+            </div>
+
+            <!-- Mapa vpravo (Mapy.cz / Google Maps embed) -->
+            <div class="lg:col-span-6 border-t lg:border-t-0 lg:border-l border-gray-800 relative bg-[#11141a]">
+                <iframe id="zasilkovna-map-iframe" class="w-full h-full min-h-[300px] border-0" loading="lazy" src="https://maps.google.com/maps?q=Praha%2011%20Haje&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+            </div>
         </div>
     </div>
 </div>
