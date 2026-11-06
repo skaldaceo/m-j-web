@@ -1202,5 +1202,245 @@ function goToCartPage() {
 document.addEventListener('DOMContentLoaded', renderCart);
     
 </script>
+<!-- POKROČILÁ POKLADNA / KOŠÍK MIRONET STYLE -->
+<div id="checkoutModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center hidden p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-[#1a1d24] border border-gray-800 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden my-4 min-h-[600px] flex flex-col">
+        
+        <!-- Hlavička kroků (Stepper) -->
+        <div class="p-4 bg-[#14171d] border-b border-gray-800 flex justify-between items-center flex-wrap gap-4">
+            <div class="flex items-center space-x-2 md:space-x-6 text-xs md:text-sm font-semibold">
+                <span id="step-tab-1" class="text-cyan-400 flex items-center gap-1.5 pb-1 border-b-2 border-cyan-400">
+                    <span class="w-5 h-5 rounded-full bg-cyan-400 text-gray-900 text-xs font-bold flex items-center justify-center">1</span> Produkty
+                </span>
+                <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
+                <span id="step-tab-2" class="text-gray-500 flex items-center gap-1.5 pb-1">
+                    <span class="w-5 h-5 rounded-full bg-gray-800 text-gray-400 text-xs font-bold flex items-center justify-center">2</span> Doprava a platba
+                </span>
+                <i class="fa-solid fa-chevron-right text-gray-600 text-xs hidden sm:inline"></i>
+                <span id="step-tab-3" class="text-gray-600 hidden sm:flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-gray-800/50 text-gray-600 text-xs font-bold flex items-center justify-center">3</span> Kontaktní údaje
+                </span>
+            </div>
+            <button type="button" onclick="closeCheckoutModal()" class="text-gray-400 hover:text-white transition-colors text-xl font-bold px-2">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 flex-1">
+            
+            <!-- LEVÝ HLAVNÍ OBSAH (KROK 1 NEBO KROK 2) -->
+            <div class="lg:col-span-8 p-4 sm:p-6 space-y-6 overflow-y-auto max-h-[75vh]">
+                
+                <!-- KROK 1: PRODUKTY & KŘÍŽOVÝ PRODEJ -->
+                <div id="checkout-step-1" class="space-y-6">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-cyan-400"></i> Váš košík
+                    </h3>
+
+                    <!-- Výpis položek v košíku -->
+                    <div id="step1-cart-items" class="space-y-3">
+                        <!-- JS sem dynamicky vykreslí zboží -->
+                    </div>
+
+                    <!-- Nabídka doporučeného příslušenství -->
+                    <div class="bg-[#12151b] p-4 rounded-xl border border-gray-800 space-y-3">
+                        <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Doporučené příslušenství ke tvému výběru
+                        </h4>
+                        <div id="cross-sell-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- JS sem vloží vhodné doplňky podle obsahu košíku -->
+                        </div>
+                    </div>
+
+                    <!-- Slevový kupón -->
+                    <div class="bg-[#12151b] p-4 rounded-xl border border-gray-800">
+                        <label class="block text-xs font-bold text-gray-300 mb-2">Využít slevový kupón</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-gift absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                                <input type="text" id="coupon-code-input" placeholder="Vložte slevový kód" class="w-full bg-[#1a1d24] border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400 uppercase tracking-wider">
+                            </div>
+                            <button type="button" onclick="applyDiscountCoupon()" class="bg-cyan-500 hover:bg-cyan-400 text-gray-900 font-bold px-5 py-2 rounded-lg text-sm transition-colors">
+                                Ověřit
+                            </button>
+                        </div>
+                        <p id="coupon-message" class="text-xs mt-2 hidden"></p>
+                    </div>
+                </div>
+
+                <!-- KROK 2: DOPRAVA A PLATBA -->
+                <div id="checkout-step-2" class="space-y-6 hidden">
+                    
+                    <!-- 1. Zvolte dopravu -->
+                    <div class="space-y-3">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <span class="text-cyan-400">1.</span> Zvolte dopravu
+                        </h3>
+
+                        <div class="space-y-2">
+                            <!-- Osobní odběr Praha 11 - Háje -->
+                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="shipping-option" value="pickup" checked onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                                        <div>
+                                            <div class="font-bold text-white text-sm">Osobní odběr (Prodejna / Sklad)</div>
+                                            <div class="text-xs text-gray-400">Šulanského 695/4, Praha 11 - Háje</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Zdarma</span>
+                                </div>
+                                
+                                <!-- Mini Google Mapa pro Háje -->
+                                <div id="pickup-map-box" class="mt-3 rounded-lg overflow-hidden border border-gray-800">
+                                    <iframe class="w-full h-36 border-0" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=Šulanského%20695/4,%20Praha%2011%20Háje&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                                </div>
+                            </label>
+
+                            <!-- Zásilkovna Výdejní místa & Boxy -->
+                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="shipping-option" value="zasilkovna-box" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                                        <div>
+                                            <div class="font-bold text-white text-sm">Zásilkovna – Výdejní místa a Z-BOXy</div>
+                                            <div id="selected-zasilkovna-text" class="text-xs text-gray-400">Vyberte výdejní místo na mapě...</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-cyan-400">89 Kč</span>
+                                </div>
+                                <button type="button" id="zasilkovna-select-btn" onclick="openZasilkovnaWidget()" class="mt-2 text-xs text-cyan-400 hover:underline flex items-center gap-1 font-semibold hidden">
+                                    <i class="fa-solid fa-map-location-dot"></i> Vybrat odběrné místo
+                                </button>
+                            </label>
+
+                            <!-- Zásilkovna Doručení na Adresu -->
+                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="shipping-option" value="zasilkovna-home" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                                        <div>
+                                            <div class="font-bold text-white text-sm">Zásilkovna – Doručení na adresu</div>
+                                            <div class="text-xs text-gray-400">Předvyplněno z uživatelského účtu</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-cyan-400">119 Kč</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Zvolte platbu -->
+                    <div class="space-y-3 pt-2">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <span class="text-cyan-400">2.</span> Zvolte platbu
+                        </h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <!-- QR Kód -->
+                            <label class="flex items-center justify-between p-3 bg-[#12151b] border border-gray-800 rounded-xl cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center gap-2.5">
+                                    <input type="radio" name="payment-option" value="qr" checked onchange="updateCheckoutTotals()" class="accent-cyan-400">
+                                    <span class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                        <i class="fa-solid fa-qrcode text-cyan-400"></i> Platba QR kódem
+                                    </span>
+                                </div>
+                                <span class="text-xs font-bold text-emerald-400">Zdarma</span>
+                            </label>
+
+                            <!-- Dobírka -->
+                            <label class="flex items-center justify-between p-3 bg-[#12151b] border border-gray-800 rounded-xl cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center gap-2.5">
+                                    <input type="radio" name="payment-option" value="cod" onchange="updateCheckoutTotals()" class="accent-cyan-400">
+                                    <span class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                        <i class="fa-solid fa-hand-holding-dollar text-amber-400"></i> Dobírka
+                                    </span>
+                                </div>
+                                <span class="text-xs font-bold text-gray-300">+49 Kč</span>
+                            </label>
+
+                            <!-- Google Pay -->
+                            <label class="flex items-center justify-between p-3 bg-[#12151b] border border-gray-800 rounded-xl cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center gap-2.5">
+                                    <input type="radio" name="payment-option" value="gpay" onchange="updateCheckoutTotals()" class="accent-cyan-400">
+                                    <span class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                        <i class="fa-brands fa-google text-cyan-400"></i> Google Pay
+                                    </span>
+                                </div>
+                                <span class="text-xs font-bold text-emerald-400">Zdarma</span>
+                            </label>
+
+                            <!-- Apple Pay -->
+                            <label class="flex items-center justify-between p-3 bg-[#12151b] border border-gray-800 rounded-xl cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center gap-2.5">
+                                    <input type="radio" name="payment-option" value="applepay" onchange="updateCheckoutTotals()" class="accent-cyan-400">
+                                    <span class="text-sm font-semibold text-white flex items-center gap-1.5">
+                                        <i class="fa-brands fa-apple text-white text-base"></i> Apple Pay
+                                    </span>
+                                </div>
+                                <span class="text-xs font-bold text-emerald-400">Zdarma</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PRAVÝ SOUHRNNÝ PANEL -->
+            <div class="lg:col-span-4 bg-[#14171d] p-4 sm:p-6 border-t lg:border-t-0 lg:border-l border-gray-800 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <h4 class="font-bold text-white text-sm border-b border-gray-800 pb-2">Obsah košíku</h4>
+                    
+                    <!-- Náhled vybraných položek -->
+                    <div id="side-cart-summary" class="space-y-2 max-h-48 overflow-y-auto text-xs">
+                        <!-- JS sem vepíše kompaktní seznam -->
+                    </div>
+
+                    <!-- Souhrn Zvolené Dopravy a Platby -->
+                    <div id="side-selected-shipping-info" class="bg-[#1a1d24] p-3 rounded-xl border border-gray-800 space-y-2 hidden text-xs">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <span class="text-gray-400 block">Doprava:</span>
+                                <span id="summary-shipping-name" class="font-bold text-white">Osobní odběr</span>
+                            </div>
+                            <span id="summary-shipping-price" class="text-cyan-400 font-bold">Zdarma</span>
+                        </div>
+                        <div class="flex items-start justify-between border-t border-gray-800/80 pt-2">
+                            <div>
+                                <span class="text-gray-400 block">Platba:</span>
+                                <span id="summary-payment-name" class="font-bold text-white">QR kód</span>
+                            </div>
+                            <span id="summary-payment-price" class="text-emerald-400 font-bold">Zdarma</span>
+                        </div>
+                    </div>
+
+                    <!-- Celková cena -->
+                    <div class="pt-3 border-t border-gray-800 space-y-1">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>Sleva / Kupón:</span>
+                            <span id="summary-discount-val" class="text-emerald-400 font-semibold">0 Kč</span>
+                        </div>
+                        <div class="flex justify-between items-baseline pt-1">
+                            <span class="text-sm font-bold text-white">Celkem:</span>
+                            <span id="summary-grand-total" class="text-xl font-extrabold text-cyan-400">0 Kč</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigační tlačítka Kroku -->
+                <div class="pt-6 space-y-2">
+                    <button type="button" id="step-next-btn" onclick="nextCheckoutStep()" class="w-full bg-cyan-400 hover:bg-cyan-300 text-gray-900 font-extrabold py-3 rounded-xl text-sm transition-colors shadow-lg shadow-cyan-500/10 flex items-center justify-center gap-2">
+                        Pokračovat k dopravě <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    
+                    <button type="button" id="step-back-btn" onclick="prevCheckoutStep()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-2 rounded-xl text-xs transition-colors hidden">
+                        <i class="fa-solid fa-arrow-left"></i> Zpět do košíku
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 </body>
 </html>
