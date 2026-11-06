@@ -1193,12 +1193,237 @@ function renderCart() {
 
     if (totalPriceEl) totalPriceEl.textContent = `${totalPrice.toLocaleString('cs-CZ')} Kč`;
 }
+    
+let currentStep = 1;
+let appliedDiscount = 0;
+let selectedZasilkovnaPoint = null;
 
-// Příprava na otevírání plnohodnotného okna/stránky v budoucnosti
+// Otevření pokladny
 function goToCartPage() {
-    alert("Zde brzy otevřeme novou pokladnu / hlavní stránku košíku!");
+    if (!cart || cart.length === 0) {
+        alert("Váš košík je prázdný.");
+        return;
+    }
+    currentStep = 1;
+    updateStepUI();
+    document.getElementById('checkoutModal')?.classList.remove('hidden');
+    renderCheckoutStep1();
 }
 
+function closeCheckoutModal() {
+    document.getElementById('checkoutModal')?.classList.add('hidden');
+}
+
+// Přepínání kroků (1. Produkty -> 2. Doprava & Platba)
+function nextCheckoutStep() {
+    if (currentStep === 1) {
+        currentStep = 2;
+        updateStepUI();
+    } else if (currentStep === 2) {
+        // Zde přejdeme na dokončení / Supabase objednávku
+        handleFinalOrderSubmit();
+    }
+}
+
+function prevCheckoutStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateStepUI();
+    }
+}
+
+function updateStepUI() {
+    const step1 = document.getElementById('checkout-step-1');
+    const step2 = document.getElementById('checkout-step-2');
+    const tab1 = document.getElementById('step-tab-1');
+    const tab2 = document.getElementById('step-tab-2');
+    const nextBtn = document.getElementById('step-next-btn');
+    const backBtn = document.getElementById('step-back-btn');
+    const sideInfo = document.getElementById('side-selected-shipping-info');
+
+    if (currentStep === 1) {
+        step1?.classList.remove('hidden');
+        step2?.classList.add('hidden');
+        tab1?.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        tab2?.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        backBtn?.classList.add('hidden');
+        sideInfo?.classList.add('hidden');
+        if (nextBtn) nextBtn.innerHTML = 'Pokračovat k dopravě <i class="fa-solid fa-arrow-right"></i>';
+    } else {
+        step1?.classList.add('hidden');
+        step2?.classList.remove('hidden');
+        tab2?.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        tab1?.classList.remove('border-b-2', 'border-cyan-400');
+        backBtn?.classList.remove('hidden');
+        sideInfo?.classList.remove('hidden');
+        if (nextBtn) nextBtn.innerHTML = 'Odeslat objednávku <i class="fa-solid fa-check"></i>';
+    }
+    updateCheckoutTotals();
+}
+
+// Vykreslení Kroku 1: Položky + Algoritmus doporučeného příslušenství
+function renderCheckoutStep1() {
+    const container = document.getElementById('step1-cart-items');
+    const sideContainer = document.getElementById('side-cart-summary');
+    const crossSellContainer = document.getElementById('cross-sell-container');
+
+    if (!container) return;
+
+    // Vykreslení řádků zboží
+    container.innerHTML = cart.map(item => `
+        <div class="flex items-center justify-between bg-[#12151b] p-3 rounded-xl border border-gray-800">
+            <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg bg-gray-900 border border-gray-800">
+            <div class="flex-1 px-3">
+                <h4 class="font-bold text-white text-sm truncate">${item.name}</h4>
+                <div class="text-xs text-cyan-400">${item.price.toLocaleString('cs-CZ')} Kč / ks</div>
+            </div>
+            <div class="flex items-center space-x-2 bg-gray-900 px-2 py-1 rounded-lg border border-gray-800">
+                <button type="button" onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 text-gray-300 font-bold hover:text-white">-</button>
+                <span class="text-xs font-bold text-white min-w-[24px] text-center">${item.quantity} ks</span>
+                <button type="button" onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 text-gray-300 font-bold hover:text-white">+</button>
+            </div>
+            <div class="text-right pl-3 min-w-[80px]">
+                <div class="font-bold text-white text-sm">${(item.price * item.quantity).toLocaleString('cs-CZ')} Kč</div>
+                <button type="button" onclick="removeFromCart('${item.id}')" class="text-xs text-gray-500 hover:text-red-400"><i class="fa-regular fa-trash-can"></i></button>
+            </div>
+        </div>
+    `).join('');
+
+    // Pravý náhledový sloupec
+    if (sideContainer) {
+        sideContainer.innerHTML = cart.map(item => `
+            <div class="flex justify-between items-center text-gray-300">
+                <span class="truncate max-w-[140px]">${item.quantity}x ${item.name}</span>
+                <span class="font-semibold text-white">${(item.price * item.quantity).toLocaleString('cs-CZ')} Kč</span>
+            </div>
+        `).join('');
+    }
+
+    // Algoritmus pro příslušenství podle vložených produktů
+    const accessories = [
+        { id: 'acc-shaker', name: 'SimpleFit Premium Šejkr 700ml', price: 199, image: 'logo.jpeg' },
+        { id: 'acc-magnesium', name: 'Magnesium Chelate 90 kapslí', price: 299, image: 'logo.jpeg' }
+    ];
+
+    if (crossSellContainer) {
+        crossSellContainer.innerHTML = accessories.map(acc => `
+            <div class="flex items-center justify-between bg-[#1a1d24] p-2.5 rounded-lg border border-gray-800">
+                <div class="flex items-center gap-2 min-w-0">
+                    <img src="${acc.image}" class="w-8 h-8 rounded object-cover">
+                    <div class="truncate">
+                        <div class="text-xs font-bold text-white truncate">${acc.name}</div>
+                        <div class="text-[10px] text-cyan-400">${acc.price} Kč</div>
+                    </div>
+                </div>
+                <button type="button" onclick="addToCart('${acc.id}', '${acc.name}', ${acc.price}, '${acc.image}', event)" class="bg-cyan-500/20 hover:bg-cyan-400 hover:text-gray-900 text-cyan-400 text-xs font-bold px-2.5 py-1 rounded transition-colors flex-shrink-0">
+                    + Přidat
+                </button>
+            </div>
+        `).join('');
+    }
+
+    updateCheckoutTotals();
+}
+
+// Algoritmus pro ověření slevového kupónu
+function applyDiscountCoupon() {
+    const input = document.getElementById('coupon-code-input');
+    const msg = document.getElementById('coupon-message');
+    if (!input || !msg) return;
+
+    const code = input.value.trim().toUpperCase();
+    if (code === 'SIMPLE10' || code === 'MIRONET10') {
+        appliedDiscount = 0.10; // 10% sleva
+        msg.textContent = '✓ Kupón uplatněn! Získáváte slevu 10 %.';
+        msg.className = 'text-xs mt-2 text-emerald-400 font-semibold';
+    } else if (code.length > 0) {
+        appliedDiscount = 0;
+        msg.textContent = '✕ Neplatný nebo vypršený slevový kód.';
+        msg.className = 'text-xs mt-2 text-red-400 font-semibold';
+    }
+    msg.classList.remove('hidden');
+    updateCheckoutTotals();
+}
+
+// Obsluha přepínání dopravy
+function handleShippingChange() {
+    const selected = document.querySelector('input[name="shipping-option"]:checked')?.value;
+    const mapBox = document.getElementById('pickup-map-box');
+    const zasilkovnaBtn = document.getElementById('zasilkovna-select-btn');
+
+    if (selected === 'pickup') {
+        mapBox?.classList.remove('hidden');
+        zasilkovnaBtn?.classList.add('hidden');
+    } else if (selected === 'zasilkovna-box') {
+        mapBox?.classList.add('hidden');
+        zasilkovnaBtn?.classList.remove('hidden');
+    } else {
+        mapBox?.classList.add('hidden');
+        zasilkovnaBtn?.classList.add('hidden');
+    }
+    updateCheckoutTotals();
+}
+
+// Simulace / Propojení widgetu Zásilkovny
+function openZasilkovnaWidget() {
+    const mockPoint = prompt("Zadejte vaše město pro vyhledání Z-BOXu / výdejny (např. Praha 11):", "Praha 11 - Háje");
+    if (mockPoint) {
+        selectedZasilkovnaPoint = `Z-BOX ${mockPoint}, Hlavní 123`;
+        document.getElementById('selected-zasilkovna-text').textContent = `Vybráno: ${selectedZasilkovnaPoint}`;
+        document.getElementById('selected-zasilkovna-text').className = 'text-xs text-cyan-400 font-bold';
+    }
+}
+
+// Přepočet celkových cen v pravém panelu
+function updateCheckoutTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const discountAmount = Math.round(subtotal * appliedDiscount);
+    
+    // Doprava
+    const shippingOpt = document.querySelector('input[name="shipping-option"]:checked')?.value;
+    let shippingPrice = 0;
+    let shippingName = 'Osobní odběr';
+
+    if (shippingOpt === 'zasilkovna-box') {
+        shippingPrice = 89;
+        shippingName = 'Zásilkovna (Box / Výdejna)';
+    } else if (shippingOpt === 'zasilkovna-home') {
+        shippingPrice = 119;
+        shippingName = 'Zásilkovna na adresu';
+    }
+
+    // Platba
+    const paymentOpt = document.querySelector('input[name="payment-option"]:checked')?.value;
+    let paymentPrice = 0;
+    let paymentName = 'QR kód';
+
+    if (paymentOpt === 'cod') {
+        paymentPrice = 49;
+        paymentName = 'Dobírka';
+    } else if (paymentOpt === 'gpay') {
+        paymentName = 'Google Pay';
+    } else if (paymentOpt === 'applepay') {
+        paymentName = 'Apple Pay';
+    }
+
+    const grandTotal = subtotal - discountAmount + shippingPrice + paymentPrice;
+
+    // Aktualizace v UI
+    document.getElementById('summary-discount-val').textContent = `-${discountAmount.toLocaleString('cs-CZ')} Kč`;
+    document.getElementById('summary-shipping-name').textContent = shippingName;
+    document.getElementById('summary-shipping-price').textContent = shippingPrice === 0 ? 'Zdarma' : `${shippingPrice} Kč`;
+    document.getElementById('summary-payment-name').textContent = paymentName;
+    document.getElementById('summary-payment-price').textContent = paymentPrice === 0 ? 'Zdarma' : `${paymentPrice} Kč`;
+    document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString('cs-CZ')} Kč`;
+}
+
+// Finální odeslání objednávky
+function handleFinalOrderSubmit() {
+    alert("Děkujeme! Vaše objednávka byla úspěšně vytvořena a odeslána.");
+    cart = [];
+    saveAndRenderCart();
+    closeCheckoutModal();
+}
 document.addEventListener('DOMContentLoaded', renderCart);
     
 </script>
