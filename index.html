@@ -1401,40 +1401,72 @@ function setZasilkovnaFilter(filterType) {
     renderZasilkovnaPointsList();
 }
 
-// Vykreslení seznamu poboček podle hledání a filtru
+// Dynamický výpis poboček + živá aktualizace mapy podle zadaného města/adresy
 function renderZasilkovnaPointsList() {
     const listEl = document.getElementById('zasilkovna-points-list');
-    const searchVal = document.getElementById('zasilkovna-search-input')?.value.toLowerCase().trim() || '';
+    const searchInput = document.getElementById('zasilkovna-search-input');
+    const searchVal = searchInput?.value.trim() || '';
 
     if (!listEl) return;
 
+    // 1. Pokud zákazník píše (více než 2 znaky), mapa vpravo se okamžitě přemístí na hledané město/adresu
+    const iframe = document.getElementById('zasilkovna-map-iframe');
+    if (iframe && searchVal.length > 2) {
+        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(searchVal + ' Zásilkovna Z-BOX')}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    }
+
+    // 2. Filtrování ze statického seznamu rychlých poboček
     const filtered = zasilkovnaPointsData.filter(item => {
         const matchesFilter = currentZFilter === 'all' || item.type === currentZFilter;
-        const matchesSearch = item.name.toLowerCase().includes(searchVal) || item.address.toLowerCase().includes(searchVal);
+        const matchesSearch = item.name.toLowerCase().includes(searchVal.toLowerCase()) || 
+                              item.address.toLowerCase().includes(searchVal.toLowerCase());
         return matchesFilter && matchesSearch;
     });
 
-    if (filtered.length === 0) {
-        listEl.innerHTML = `<div class="text-center text-gray-400 py-8 text-xs">Žádné odběrné místo neodpovídá vyhledávání.</div>`;
-        return;
+    let htmlContent = '';
+
+    // 3. Dynamická karta pro jakékoliv vyhledané město / ulici
+    if (searchVal.length > 2) {
+        const dynamicName = `Z-BOX / Výdejní místo – ${searchVal}`;
+        const dynamicAddress = `Vybraná lokalita: ${searchVal}`;
+        
+        htmlContent += `
+            <div class="bg-cyan-500/10 border border-cyan-400/40 p-3 rounded-xl hover:border-cyan-400 transition-all flex items-center justify-between gap-2 mb-3">
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-cyan-300"><i class="fa-solid fa-location-dot"></i> ${dynamicName}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold bg-cyan-500/20 text-cyan-400">Vyhledaný bod</span>
+                    </div>
+                    <div class="text-[11px] text-gray-300 mt-0.5">${dynamicAddress}</div>
+                </div>
+                <button type="button" onclick="selectZasilkovnaBranch('${dynamicName}')" class="bg-cyan-400 hover:bg-cyan-300 text-gray-900 text-xs font-extrabold px-3 py-1.5 rounded-lg transition-colors flex-shrink-0">
+                    Vybrat
+                </button>
+            </div>
+        `;
     }
 
-    listEl.innerHTML = filtered.map(item => `
-        <div class="bg-[#1a1d24] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/50 transition-all flex items-center justify-between gap-2 cursor-pointer" onclick="previewZasilkovnaMap('${item.query}')">
-            <div>
-                <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-bold text-white">${item.name}</span>
-                    <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${item.type === 'box' ? 'bg-red-500/20 text-red-400' : 'bg-cyan-500/20 text-cyan-400'}">
-                        ${item.type === 'box' ? 'Z-BOX' : 'Výdejna'}
-                    </span>
+    // 4. Vykreslení shodných lokálních poboček
+    if (filtered.length > 0) {
+        htmlContent += filtered.map(item => `
+            <div class="bg-[#1a1d24] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/50 transition-all flex items-center justify-between gap-2 cursor-pointer" onclick="previewZasilkovnaMap('${item.query}')">
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-white">${item.name}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${item.type === 'box' ? 'bg-red-500/20 text-red-400' : 'bg-cyan-500/20 text-cyan-400'}">
+                            ${item.type === 'box' ? 'Z-BOX' : 'Výdejna'}
+                        </span>
+                    </div>
+                    <div class="text-[11px] text-gray-400 mt-0.5">${item.address}</div>
                 </div>
-                <div class="text-[11px] text-gray-400 mt-0.5">${item.address}</div>
+                <button type="button" onclick="selectZasilkovnaBranch('${item.name}')" class="bg-cyan-400 hover:bg-cyan-300 text-gray-900 text-xs font-extrabold px-3 py-1.5 rounded-lg transition-colors flex-shrink-0">
+                    Vybrat
+                </button>
             </div>
-            <button type="button" onclick="selectZasilkovnaBranch('${item.name}')" class="bg-cyan-400 hover:bg-cyan-300 text-gray-900 text-xs font-extrabold px-3 py-1.5 rounded-lg transition-colors flex-shrink-0">
-                Vybrat
-            </button>
-        </div>
-    `).join('');
+        `).join('');
+    }
+
+    listEl.innerHTML = htmlContent;
 }
 
 function filterZasilkovnaPoints() {
