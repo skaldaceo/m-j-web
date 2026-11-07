@@ -1703,7 +1703,12 @@ function renderOrderSummaryStep4() {
                 <span id="step-tab-3" class="text-gray-600 hidden sm:flex items-center gap-1.5">
                     <span class="w-5 h-5 rounded-full bg-gray-800/50 text-gray-600 text-xs font-bold flex items-center justify-center">3</span> Kontaktní údaje
                 </span>
-            </div>
+            <i class="fa-solid fa-chevron-right text-gray-600 text-xs hidden sm:inline"></i>
+<span id="step-tab-4" class="text-gray-500 hidden sm:flex items-center gap-1.5 cursor-pointer" onclick="goToStep(4)">
+    <span class="w-5 h-5 rounded-full bg-gray-800/50 text-gray-600 text-xs font-bold flex items-center justify-center">4</span>
+    <span class="hidden md:inline">Shrnutí</span>
+</span>
+        </div>
             <button type="button" onclick="closeCheckoutModal()" class="text-gray-400 hover:text-white transition-colors text-xl font-bold px-2">
                 <i class="fa-solid fa-xmark"></i>
             </button>
