@@ -1270,7 +1270,7 @@ function updateStepUI() {
     updateStepperUI(currentStep);
     updateCheckoutTotals();
 }
-/ Aktualizace stavu krokovovače (1. Produkty, 2. Doprava a platba, 3. Kontaktní údaje, 4. Shrnutí)
+// Aktualizace stavu krokovovače (1. Produkty, 2. Doprava a platba, 3. Kontaktní údaje, 4. Shrnutí)
 function updateStepperUI(activeStep) {
     for (let i = 1; i <= 4; i++) {
         const tab = document.getElementById(`stepper-tab-${i}`) || 
