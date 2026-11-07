@@ -1870,85 +1870,86 @@ function renderOrderSummaryStep4() {
                         </div>
                     </div>
                     
-<!-- 3. KROK: KONTAKTNÍ ÚDAJE (MIRONET STYL) -->
-<div id="checkout-step-3" class="space-y-4 hidden">
-    <div>
-        <h2 class="text-lg font-bold text-white">Informace pro dodání zboží</h2>
-        <h3 class="text-xs font-semibold text-gray-400 mt-0.5">Fakturační údaje</h3>
-    </div>
-
-    <!-- Nakupuji na firmu checkbox -->
-    <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-300 font-medium bg-[#12151b] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/40 transition-all">
-        <input type="checkbox" id="is-company-check" onchange="toggleCompanyFields()" class="accent-cyan-400 rounded w-4 h-4">
-        <span>Nakupuji na firmu</span>
-    </label>
-
-    <!-- Firemní údaje (skryté v základu) -->
-    <div id="company-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden bg-[#12151b] p-3.5 rounded-xl border border-gray-800">
-        <div>
-            <label class="block text-[11px] font-medium text-gray-400 mb-1">Název firmy *</label>
-            <input type="text" id="company-name" placeholder="Firma s.r.o." class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
-        </div>
-        <div>
-            <label class="block text-[11px] font-medium text-gray-400 mb-1">IČO *</label>
-            <input type="text" id="company-ico" placeholder="12345678" class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
-        </div>
-    </div>
-
-    <!-- Osobní údaje formulář -->
-    <div class="space-y-3">
-        <div>
-            <label class="block text-[11px] font-medium text-gray-400 mb-1">E-mail *</label>
-            <input type="email" id="checkout-email" placeholder="m7skalicky@gmail.com" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-                <label class="block text-[11px] font-medium text-gray-400 mb-1">Jméno a příjmení *</label>
-                <input type="text" id="checkout-name" placeholder="VIP TOP Seller Skalický" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[11px] font-medium text-gray-400 mb-1">Telefonní číslo *</label>
-                <input type="tel" id="checkout-phone" placeholder="+420 737 657 757" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-                <label class="block text-[11px] font-medium text-gray-400 mb-1">Ulice a číslo popisné *</label>
-                <input type="text" id="checkout-street" placeholder="Sulanského 695/4" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[11px] font-medium text-gray-400 mb-1">Město *</label>
-                <input type="text" id="checkout-city" placeholder="Prague" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-                <label class="block text-[11px] font-medium text-gray-400 mb-1">PSČ *</label>
-                <input type="text" id="checkout-zip" placeholder="14900" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[11px] font-medium text-gray-400 mb-1">Stát *</label>
-                <select id="checkout-country" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-                    <option value="CZ" selected>Česká republika</option>
-                    <option value="SK">Slovenská republika</option>
-                </select>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 4. KROK: SHRNUTÍ OBJEDNÁVKY -->
-<div id="checkout-step-4" class="space-y-4 hidden">
-    <h2 class="text-lg font-bold text-white">Shrnutí objednávky</h2>
-    <div id="summary-step4-content" class="space-y-3 bg-[#12151b] p-4 rounded-xl border border-gray-800 text-xs">
-        <!-- Zde se dynamicky vykreslí přehled objednaného zboží, vybrané dopravy, platby a doručovací adresy -->
+            <!-- 3. KROK: KONTAKTNÍ ÚDAJE (MIRONET STYL) -->
+            <div id="checkout-step-3" class="space-y-4 hidden">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Informace pro dodání zboží</h2>
+                    <h3 class="text-xs font-semibold text-gray-400 mt-0.5">Fakturační údaje</h3>
                 </div>
-        </div>
-</div>
-                
+
+                <!-- Nakupuji na firmu checkbox -->
+                <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-300 font-medium bg-[#12151b] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/40 transition-all">
+                    <input type="checkbox" id="is-company-check" onchange="toggleCompanyFields()" class="accent-cyan-400 rounded w-4 h-4">
+                    <span>Nakupuji na firmu</span>
+                </label>
+
+                <!-- Firemní údaje (skryté v základu) -->
+                <div id="company-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden bg-[#12151b] p-3.5 rounded-xl border border-gray-800">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Název firmy *</label>
+                        <input type="text" id="company-name" placeholder="Firma s.r.o." class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">IČO *</label>
+                        <input type="text" id="company-ico" placeholder="12345678" class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Osobní údaje formulář -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">E-mail *</label>
+                        <input type="email" id="checkout-email" placeholder="m7skalicky@gmail.com" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Jméno a příjmení *</label>
+                            <input type="text" id="checkout-name" placeholder="Martin Skalický" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Telefonní číslo *</label>
+                            <input type="tel" id="checkout-phone" placeholder="+420 737 657 757" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Ulice a číslo popisné *</label>
+                            <input type="text" id="checkout-street" placeholder="Sulanského 695/4" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Město *</label>
+                            <input type="text" id="checkout-city" placeholder="Praha 11" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">PSČ *</label>
+                            <input type="text" id="checkout-zip" placeholder="14900" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Stát *</label>
+                            <select id="checkout-country" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                                <option value="CZ" selected>Česká republika</option>
+                                <option value="SK">Slovenská republika</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. KROK: SHRNUTÍ OBJEDNÁVKY -->
+            <div id="checkout-step-4" class="space-y-4 hidden">
+                <h2 class="text-lg font-bold text-white">Shrnutí objednávky</h2>
+                <div id="summary-step4-content" class="space-y-3 bg-[#12151b] p-4 rounded-xl border border-gray-800 text-xs">
+                    <!-- Dynamický přehled -->
+                </div>
+            </div>
+
+        </div><!-- /Konec levého hlavního sloupce lg:col-span-8 -->       
+
             <!-- PRAVÝ SOUHRNNÝ PANEL -->
             <div class="lg:col-span-4 bg-[#14171d] p-4 sm:p-6 border-t lg:border-t-0 lg:border-l border-gray-800 flex flex-col justify-between">
                 <div class="space-y-4">
