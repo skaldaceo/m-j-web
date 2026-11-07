@@ -1270,7 +1270,23 @@ function updateStepUI() {
     updateStepperUI(currentStep);
     updateCheckoutTotals();
 }
-
+/ Aktualizace stavu krokovovače (1. Produkty, 2. Doprava a platba, 3. Kontaktní údaje, 4. Shrnutí)
+function updateStepperUI(activeStep) {
+    for (let i = 1; i <= 4; i++) {
+        const tab = document.getElementById(`stepper-tab-${i}`) || 
+                    document.getElementById(`stop-tab-${i}`) || 
+                    document.getElementById(`step-tab-${i}`);
+        if (tab) {
+            if (i === activeStep) {
+                tab.className = 'font-bold text-cyan-400 border-b-2 border-cyan-400 pb-1 transition-all cursor-pointer';
+            } else if (i < activeStep) {
+                tab.className = 'font-semibold text-emerald-400 transition-all cursor-pointer';
+            } else {
+                tab.className = 'font-semibold text-gray-500 transition-all cursor-pointer';
+            }
+        }
+    }
+}
 // Vykreslení Kroku 1: Položky + Algoritmus doporučeného příslušenství
 function renderCheckoutStep1() {
     const container = document.getElementById('step1-cart-items');
