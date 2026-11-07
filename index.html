@@ -1571,6 +1571,91 @@ function handleFinalOrderSubmit() {
 }
 document.addEventListener('DOMContentLoaded', renderCart);
     
+// 1. Přepínání polí pro nákup na firmu
+function toggleCompanyFields() {
+    const isCompany = document.getElementById('is-company-check')?.checked;
+    const companyFields = document.getElementById('company-fields');
+    if (isCompany) {
+        companyFields?.classList.remove('hidden');
+    } else {
+        companyFields?.classList.add('hidden');
+    }
+}
+
+// 2. Automatické předvyplnění údajů z přihlášení (Supabase)
+async function autoFillUserData() {
+    if (typeof supabase !== 'undefined') {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            if (document.getElementById('checkout-email')) document.getElementById('checkout-email').value = user.email || '';
+            if (document.getElementById('checkout-name')) document.getElementById('checkout-name').value = user.user_metadata?.full_name || 'Martin Skalický';
+            if (document.getElementById('checkout-phone')) document.getElementById('checkout-phone').value = user.user_metadata?.phone || '+420 737 657 757';
+            if (document.getElementById('checkout-street')) document.getElementById('checkout-street').value = user.user_metadata?.street || 'Sulanského 695/4';
+            if (document.getElementById('checkout-city')) document.getElementById('checkout-city').value = user.user_metadata?.city || 'Prague';
+            if (document.getElementById('checkout-zip')) document.getElementById('checkout-zip').value = user.user_metadata?.zip || '14900';
+        }
+    }
+}
+
+// 3. Vykreslení přehledu v 4. kroku (Shrnutí objednávky)
+function renderOrderSummaryStep4() {
+    const summaryContainer = document.getElementById('summary-step4-content');
+    if (!summaryContainer) return;
+
+    const email = document.getElementById('checkout-email')?.value || 'Nezadáno';
+    const name = document.getElementById('checkout-name')?.value || 'Nezadáno';
+    const phone = document.getElementById('checkout-phone')?.value || 'Nezadáno';
+    const street = document.getElementById('checkout-street')?.value || 'Nezadáno';
+    const city = document.getElementById('checkout-city')?.value || 'Nezadáno';
+    const zip = document.getElementById('checkout-zip')?.value || 'Nezadáno';
+    const note = document.getElementById('checkout-note')?.value;
+
+    const isCompany = document.getElementById('is-company-check')?.checked;
+    const companyName = document.getElementById('company-name')?.value;
+    const companyIco = document.getElementById('company-ico')?.value;
+
+    const itemsHtml = cart.map(item => `
+        <div class="flex items-center justify-between py-1.5 border-b border-gray-800">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-white">${item.quantity}x</span>
+                <span class="text-gray-300">${item.title}</span>
+            </div>
+            <span class="font-bold text-white">${(item.price * item.quantity).toLocaleString()} Kč</span>
+        </div>
+    `).join('');
+
+    summaryContainer.innerHTML = `
+        <div class="mb-4">
+            <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">Položky v košíku</div>
+            <div class="space-y-1">${itemsHtml}</div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 pt-2 border-t border-gray-800">
+            <div class="bg-[#181d24] p-3 rounded-lg border border-gray-800">
+                <div class="text-[10px] text-gray-400 font-bold uppercase">Zvolená doprava</div>
+                <div class="text-xs font-bold text-white mt-1">${selectedShippingName || 'Osobní odběr'}</div>
+                ${selectedZasilkovnaPoint ? `<div class="text-[11px] text-cyan-400 mt-0.5">${selectedZasilkovnaPoint}</div>` : ''}
+            </div>
+            <div class="bg-[#181d24] p-3 rounded-lg border border-gray-800">
+                <div class="text-[10px] text-gray-400 font-bold uppercase">Zvolená platba</div>
+                <div class="text-xs font-bold text-white mt-1">${selectedPaymentName || 'Platba QR kódem'}</div>
+            </div>
+        </div>
+
+        <div class="bg-[#181d24] p-3 rounded-lg border border-gray-800 mb-3">
+            <div class="text-[10px] text-gray-400 font-bold uppercase mb-1">Doručovací údaje</div>
+            <div class="font-bold text-white">${name} ${isCompany && companyName ? `(${companyName}, IČO: ${companyIco})` : ''}</div>
+            <div class="text-gray-300">${street}, ${zip} ${city}</div>
+            <div class="text-gray-400 text-[11px] mt-1"><i class="fa-solid fa-envelope text-cyan-400"></i> ${email} | <i class="fa-solid fa-phone text-cyan-400"></i> ${phone}</div>
+        </div>
+
+        ${note ? `
+            <div class="bg-[#181d24] p-2.5 rounded-lg border border-gray-800 text-[11px]">
+                <span class="text-gray-400 font-bold">Poznámka:</span> <span class="text-gray-300 italic">"${note}"</span>
+            </div>
+        ` : ''}
+    `;
+}
 </script>
 <!-- POKROČILÁ POKLADNA / KOŠÍK MIRONET STYLE -->
 <div id="checkoutModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center hidden p-2 sm:p-4 overflow-y-auto">
