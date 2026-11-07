@@ -1215,14 +1215,26 @@ function closeCheckoutModal() {
     document.getElementById('checkoutModal')?.classList.add('hidden');
 }
 
-// Přepínání kroků (1. Produkty -> 2. Doprava & Platba)
+// Přepínání kroků (1. Produkty -> 2. Doprava a platba -> 3. Kontaktní údaje -> 4. Shrnutí)
 function nextCheckoutStep() {
     if (currentStep === 1) {
         currentStep = 2;
         updateStepUI();
     } else if (currentStep === 2) {
-        // Zde přejdeme na dokončení / Supabase objednávku
-        handleFinalOrderSubmit();
+        currentStep = 3;
+        updateStepUI();
+        if (typeof autoFillUserData === 'function') autoFillUserData();
+    } else if (currentStep === 3) {
+        currentStep = 4;
+        updateStepUI();
+        if (typeof renderOrderSummaryStep4 === 'function') renderOrderSummaryStep4();
+    } else if (currentStep === 4) {
+        // Až ve 4. kroku se odešle objednávka do Supabase
+        if (typeof handleFinalOrderSubmit === 'function') {
+            handleFinalOrderSubmit();
+        } else if (typeof submitOrder === 'function') {
+            submitOrder();
+        }
     }
 }
 
