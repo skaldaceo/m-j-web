@@ -662,6 +662,24 @@
                 setTimeout(() => cartBadge.style.transform = 'scale(1)', 200);
             }, 800);
         }
+        // Logika přidání do košíku
+    if (!id || typeof price !== 'number') return;
+    const existingItem = cart.find(item => item.id === id);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ id: id, name: name, price: price, image: image || 'logo.jpeg', quantity: 1 });
+    }
+    
+    // 1. Uloží do lokální paměti a překreslí navigační lištu
+    saveAndRenderCart(); 
+
+    // 2. NOVÉ: Pokud jsme zrovna uvnitř 1. kroku pokladny, okamžitě ho vizuálně zaktualizuje
+    const checkoutModal = document.getElementById('checkoutModal');
+    if (checkoutModal && !checkoutModal.classList.contains('hidden') && currentStep === 1) {
+        renderCheckoutStep1(); 
+    }
+}
 
         // MODÁLNÍ OKNA - Otevírání, zavírání, přepínání
         const backdrop = document.getElementById('modalBackdrop');
