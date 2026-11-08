@@ -1685,6 +1685,7 @@ function renderOrderSummaryStep4() {
     `;
 }
 </script>
+    
 <!-- POKROČILÁ POKLADNA / KOŠÍK MIRONET STYLE -->
 <div id="checkoutModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center hidden p-2 sm:p-4 overflow-y-auto">
     <div class="bg-[#1a1d24] border border-gray-800 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden my-4 min-h-[600px] flex flex-col">
@@ -1703,12 +1704,12 @@ function renderOrderSummaryStep4() {
                 <span id="step-tab-3" class="text-gray-600 hidden sm:flex items-center gap-1.5">
                     <span class="w-5 h-5 rounded-full bg-gray-800/50 text-gray-600 text-xs font-bold flex items-center justify-center">3</span> Kontaktní údaje
                 </span>
-            <i class="fa-solid fa-chevron-right text-gray-600 text-xs hidden sm:inline"></i>
-<span id="step-tab-4" class="text-gray-500 hidden sm:flex items-center gap-1.5 cursor-pointer" onclick="goToStep(4)">
-    <span class="w-5 h-5 rounded-full bg-gray-800/50 text-gray-600 text-xs font-bold flex items-center justify-center">4</span>
-    <span class="hidden md:inline">Shrnutí</span>
-</span>
-        </div>
+                <i class="fa-solid fa-chevron-right text-gray-600 text-xs hidden sm:inline"></i>
+                <span id="step-tab-4" class="text-gray-500 hidden sm:flex items-center gap-1.5 cursor-pointer" onclick="goToStep(4)">
+                    <span class="w-5 h-5 rounded-full bg-gray-800/50 text-gray-600 text-xs font-bold flex items-center justify-center">4</span>
+                    <span class="hidden md:inline">Shrnutí</span>
+                </span>
+            </div>
             <button type="button" onclick="closeCheckoutModal()" class="text-gray-400 hover:text-white transition-colors text-xl font-bold px-2">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -1716,8 +1717,8 @@ function renderOrderSummaryStep4() {
 
         <div class="grid grid-cols-12 flex-1">
             
-            <!-- LEVÝ HLAVNÍ OBSAH (KROK 1 NEBO KROK 2) -->
-        <div class="col-span-8 p-4 sm:p-6 space-y-6 overflow-y-auto max-h-[75vh]">
+            <!-- LEVÝ HLAVNÍ OBSAH (KROKY 1 AŽ 4) -->
+            <div class="col-span-8 p-4 sm:p-6 space-y-6 overflow-y-auto max-h-[75vh]">
                 
                 <!-- KROK 1: PRODUKTY & KŘÍŽOVÝ PRODEJ -->
                 <div id="checkout-step-1" class="space-y-6">
@@ -1759,64 +1760,65 @@ function renderOrderSummaryStep4() {
                 <!-- KROK 2: DOPRAVA A PLATBA -->
                 <div id="checkout-step-2" class="space-y-6 hidden">
                     
-                  <!-- 1. Zvolte dopravu -->
-<div class="space-y-3">
-    <h3 class="text-base font-bold text-white flex items-center gap-2">
-        <span class="text-cyan-400">1.</span> Zvolte dopravu
-    </h3>
+                    <!-- 1. Zvolte dopravu -->
+                    <div class="space-y-3">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <span class="text-cyan-400">1.</span> Zvolte dopravu
+                        </h3>
 
-    <div class="space-y-2">
-        <!-- Osobní odběr Praha 11 - Háje -->
-        <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <input type="radio" name="shipping-option" value="pickup" checked onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
-                    <div>
-                        <div class="font-bold text-white text-sm">Osobní odběr (Prodejna / Sklad)</div>
-                        <div class="text-xs text-cyan-400 font-semibold mt-0.5">Sulanského 695/4, Praha 11 - Háje</div>
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Zdarma</span>
-            </div>
-            
-            <!-- Mini Google Mapa pro Háje -->
-            <div id="pickup-map-box" class="mt-3 rounded-lg overflow-hidden border border-gray-800">
-                <iframe class="w-full h-36 border-0" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=Sulanského%20695/4,%20Praha%2011%20Háje&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
-            </div>
-        </label>
+                        <div class="space-y-2">
+                            <!-- Osobní odběr Praha 11 - Háje -->
+                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="shipping-option" value="pickup" checked onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                                        <div>
+                                            <div class="font-bold text-white text-sm">Osobní odběr (Prodejna / Sklad)</div>
+                                            <div class="text-xs text-cyan-400 font-semibold mt-0.5">Sulanského 695/4, Praha 11 - Háje</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Zdarma</span>
+                                </div>
+                                
+                                <!-- Mini Google Mapa pro Háje -->
+                                <div id="pickup-map-box" class="mt-3 rounded-lg overflow-hidden border border-gray-800">
+                                    <iframe class="w-full h-36 border-0" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=Sulansk%C3%A9ho%20695/4,%20Praha%2011%20H%C3%A1je&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+                                </div>
+                            </label>
 
-        <!-- Zásilkovna Výdejní místa & Boxy -->
-        <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <input type="radio" name="shipping-option" value="zasilkovna-box" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
-                    <div>
-                        <div class="font-bold text-white text-sm">Zásilkovna – Výdejní místa a Z-BOXy</div>
-                        <div id="selected-zasilkovna-text" class="text-xs text-gray-400 mt-0.5">Není vybráno žádné odběrné místo</div>
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-cyan-400">89 Kč</span>
-            </div>
-            <button type="button" id="zasilkovna-select-btn" onclick="openZasilkovnaModal()" class="mt-2.5 text-xs bg-cyan-500/20 hover:bg-cyan-400 hover:text-gray-900 text-cyan-400 border border-cyan-500/30 font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hidden">
-                <i class="fa-solid fa-map-location-dot"></i> Vybrat odběrné místo na mapě
-            </button>
-        </label>
+                            <!-- Zásilkovna Výdejní místa & Boxy -->
+                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="shipping-option" value="zasilkovna-box" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                                        <div>
+                                            <div class="font-bold text-white text-sm">Zásilkovna – Výdejní místa a Z-BOXy</div>
+                                            <div id="selected-zasilkovna-text" class="text-xs text-gray-400 mt-0.5">Není vybráno žádné odběrné místo</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-cyan-400">89 Kč</span>
+                                </div>
+                                <button type="button" id="zasilkovna-select-btn" onclick="openZasilkovnaModal()" class="mt-2.5 text-xs bg-cyan-500/20 hover:bg-cyan-400 hover:text-gray-900 text-cyan-400 border border-cyan-500/30 font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hidden">
+                                    <i class="fa-solid fa-map-location-dot"></i> Vybrat odběrné místo na mapě
+                                </button>
+                            </label>
 
-        <!-- Zásilkovna Doručení na Adresu -->
-        <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <input type="radio" name="shipping-option" value="zasilkovna-home" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
-                    <div>
-                        <div class="font-bold text-white text-sm">Zásilkovna – Doručení na adresu</div>
-                        <div id="user-delivery-address-display" class="text-xs text-cyan-400 font-semibold mt-0.5">Doručit na: Sulanského 695/4, Praha 11 - Háje</div>
+                            <!-- Zásilkovna Doručení na Adresu -->
+                            <label class="block bg-[#12151b] border border-gray-800 rounded-xl p-3.5 cursor-pointer hover:border-cyan-400/50 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="shipping-option" value="zasilkovna-home" onchange="handleShippingChange()" class="accent-cyan-400 w-4 h-4">
+                                        <div>
+                                            <div class="font-bold text-white text-sm">Zásilkovna – Doručení na adresu</div>
+                                            <div id="user-delivery-address-display" class="text-xs text-cyan-400 font-semibold mt-0.5">Doručit na: Sulanského 695/4, Praha 11 - Háje</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-bold text-cyan-400">119 Kč</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <span class="text-xs font-bold text-cyan-400">119 Kč</span>
-            </div>
-        </label>
-    </div>
-</div>
+
                     <!-- 2. Zvolte platbu -->
                     <div class="space-y-3 pt-2">
                         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -1868,88 +1870,91 @@ function renderOrderSummaryStep4() {
                                 <span class="text-xs font-bold text-emerald-400">Zdarma</span>
                             </label>
                         </div>
-                    
-            <!-- 3. KROK: KONTAKTNÍ ÚDAJE (MIRONET STYL) -->
-            <div id="checkout-step-3" class="space-y-4 hidden">
-                <div>
-                    <h2 class="text-lg font-bold text-white">Informace pro dodání zboží</h2>
-                    <h3 class="text-xs font-semibold text-gray-400 mt-0.5">Fakturační údaje</h3>
-                </div>
+                    </div>
+                </div> <!-- /Konec checkout-step-2 -->
 
-                <!-- Nakupuji na firmu checkbox -->
-                <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-300 font-medium bg-[#12151b] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/40 transition-all">
-                    <input type="checkbox" id="is-company-check" onchange="toggleCompanyFields()" class="accent-cyan-400 rounded w-4 h-4">
-                    <span>Nakupuji na firmu</span>
-                </label>
-
-                <!-- Firemní údaje (skryté v základu) -->
-                <div id="company-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden bg-[#12151b] p-3.5 rounded-xl border border-gray-800">
+                <!-- 3. KROK: KONTAKTNÍ ÚDAJE (MIRONET STYL) -->
+                <div id="checkout-step-3" class="space-y-4 hidden">
                     <div>
-                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Název firmy *</label>
-                        <input type="text" id="company-name" placeholder="Firma s.r.o." class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-400 mb-1">IČO *</label>
-                        <input type="text" id="company-ico" placeholder="12345678" class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
-                    </div>
-                </div>
-
-                <!-- Osobní údaje formulář -->
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-[11px] font-medium text-gray-400 mb-1">E-mail *</label>
-                        <input type="email" id="checkout-email" placeholder="m7skalicky@gmail.com" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                        <h2 class="text-lg font-bold text-white">Informace pro dodání zboží</h2>
+                        <h3 class="text-xs font-semibold text-gray-400 mt-0.5">Fakturační údaje</h3>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Nakupuji na firmu checkbox -->
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-gray-300 font-medium bg-[#12151b] p-3 rounded-xl border border-gray-800 hover:border-cyan-400/40 transition-all">
+                        <input type="checkbox" id="is-company-check" onchange="toggleCompanyFields()" class="accent-cyan-400 rounded w-4 h-4">
+                        <span>Nakupuji na firmu</span>
+                    </label>
+
+                    <!-- Firemní údaje (skryté v základu) -->
+                    <div id="company-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden bg-[#12151b] p-3.5 rounded-xl border border-gray-800">
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Jméno a příjmení *</label>
-                            <input type="text" id="checkout-name" placeholder="Martin Skalický" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Název firmy *</label>
+                            <input type="text" id="company-name" placeholder="Firma s.r.o." class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Telefonní číslo *</label>
-                            <input type="tel" id="checkout-phone" placeholder="+420 737 657 757" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">IČO *</label>
+                            <input type="text" id="company-ico" placeholder="12345678" class="w-full bg-[#181d24] border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-cyan-400 focus:outline-none">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Osobní údaje formulář -->
+                    <div class="space-y-3">
                         <div>
-                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Ulice a číslo popisné *</label>
-                            <input type="text" id="checkout-street" placeholder="Sulanského 695/4" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            <label class="block text-[11px] font-medium text-gray-400 mb-1">E-mail *</label>
+                            <input type="email" id="checkout-email" placeholder="m7skalicky@gmail.com" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Město *</label>
-                            <input type="text" id="checkout-city" placeholder="Praha 11" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">Jméno a příjmení *</label>
+                                <input type="text" id="checkout-name" placeholder="Martin Skalický" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">Telefonní číslo *</label>
+                                <input type="tel" id="checkout-phone" placeholder="+420 737 657 757" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">Ulice a číslo popisné *</label>
+                                <input type="text" id="checkout-street" placeholder="Sulanského 695/4" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">Město *</label>
+                                <input type="text" id="checkout-city" placeholder="Praha 11" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">PSČ *</label>
+                                <input type="text" id="checkout-zip" placeholder="14900" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">Stát *</label>
+                                <select id="checkout-country" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
+                                    <option value="CZ" selected>Česká republika</option>
+                                    <option value="SK">Slovenská republika</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
+                </div> <!-- /Konec checkout-step-3 -->
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[11px] font-medium text-gray-400 mb-1">PSČ *</label>
-                            <input type="text" id="checkout-zip" placeholder="14900" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-gray-400 mb-1">Stát *</label>
-                            <select id="checkout-country" class="w-full bg-[#12151b] border border-gray-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none">
-                                <option value="CZ" selected>Česká republika</option>
-                                <option value="SK">Slovenská republika</option>
-                            </select>
-                        </div>
+                <!-- 4. KROK: SHRNUTÍ OBJEDNÁVKY -->
+                <div id="checkout-step-4" class="space-y-4 hidden">
+                    <h2 class="text-lg font-bold text-white">Shrnutí objednávky</h2>
+                    <div id="summary-step4-content" class="space-y-3 bg-[#12151b] p-4 rounded-xl border border-gray-800 text-xs">
+                        <!-- Dynamický přehled -->
                     </div>
-                </div>
+                </div> <!-- /Konec checkout-step-4 -->
 
-            <!-- 4. KROK: SHRNUTÍ OBJEDNÁVKY -->
-            <div id="checkout-step-4" class="space-y-4 hidden">
-                <h2 class="text-lg font-bold text-white">Shrnutí objednávky</h2>
-                <div id="summary-step4-content" class="space-y-3 bg-[#12151b] p-4 rounded-xl border border-gray-800 text-xs">
-                    <!-- Dynamický přehled -->
-                </div>
-            </div>
-
-        </div><!-- /Konec levého hlavního sloupce lg:col-span-8 -->       
+            </div> <!-- /Konec levého hlavního sloupce (col-span-8) -->
 
             <!-- PRAVÝ SOUHRNNÝ PANEL -->
-        <div class="col-span-4 bg-[#14171d] p-4 sm:p-6 border-l border-gray-800 flex flex-col justify-between">
+            <div class="col-span-4 bg-[#14171d] p-4 sm:p-6 border-l border-gray-800 flex flex-col justify-between">
                 <div class="space-y-4">
                     <h4 class="font-bold text-white text-sm border-b border-gray-800 pb-2">Obsah košíku</h4>
                     
@@ -1999,11 +2004,12 @@ function renderOrderSummaryStep4() {
                         <i class="fa-solid fa-arrow-left"></i> Zpět do košíku
                     </button>
                 </div>
-            </div>
+            </div> <!-- /Konec pravého souhrnného panelu (col-span-4) -->
 
-        </div>
-    </div>
-</div>
+        </div> <!-- /Konec hlavního gridu (grid-cols-12) -->
+    </div> <!-- /Konec karty modálu (max-w-5xl) -->
+</div> <!-- /Konec checkoutModal -->
+    
 <!-- MODÁLNÍ OKNO PRO VYHLEDÁVÁNÍ ODBĚRNÝCH MÍST ZÁSILKOVNY -->
 <div id="zasilkovnaModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[120] flex items-center justify-center hidden p-2 sm:p-4">
     <div class="bg-[#1a1d24] border border-gray-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
