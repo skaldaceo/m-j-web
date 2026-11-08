@@ -1630,13 +1630,13 @@ function renderOrderSummaryStep4() {
     const summaryContainer = document.getElementById('summary-step4-content');
     if (!summaryContainer) return;
 
-    // Načtení kontaktních údajů z formuláře 3. kroku
-    const email = document.getElementById('checkout-email')?.value || 'Nezadáno';
-    const name = document.getElementById('checkout-name')?.value || 'Nezadáno';
-    const phone = document.getElementById('checkout-phone')?.value || 'Nezadáno';
-    const street = document.getElementById('checkout-street')?.value || 'Nezadáno';
-    const city = document.getElementById('checkout-city')?.value || 'Nezadáno';
-    const zip = document.getElementById('checkout-zip')?.value || 'Nezadáno';
+    // Bezpečné načtení hodnot přímo z inputů 3. kroku
+    const email = document.getElementById('checkout-email')?.value || document.getElementById('reg-email')?.value || 'Nezadáno';
+    const name = document.getElementById('checkout-name')?.value || document.getElementById('reg-jmeno')?.value || 'Nezadáno';
+    const phone = document.getElementById('checkout-phone')?.value || document.getElementById('reg-telefon')?.value || 'Nezadáno';
+    const street = document.getElementById('checkout-street')?.value || document.getElementById('reg-ulice')?.value || 'Nezadáno';
+    const city = document.getElementById('checkout-city')?.value || document.getElementById('reg-mesto')?.value || 'Nezadáno';
+    const zip = document.getElementById('checkout-zip')?.value || document.getElementById('reg-psc')?.value || 'Nezadáno';
 
     const isCompany = document.getElementById('is-company-check')?.checked;
     const companyName = document.getElementById('company-name')?.value;
