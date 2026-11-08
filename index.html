@@ -665,24 +665,6 @@ function addToCart(id, name, price, image, event) {
         }, 800);
     }
     
-    // Logika přidání do košíku
-    if (!id || typeof price !== 'number') return;
-    const existingItem = cart.find(item => item.id === id);
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({ id: id, name: name, price: price, image: image || 'logo.jpeg', quantity: 1 });
-    }
-    
-    // Uloží do lokální paměti a překreslí navigační lištu
-    saveAndRenderCart(); 
-
-    // OKAMŽITÉ PŘEKRESLENÍ KOŠÍKU: Pokud je otevřený 1. krok pokladny, hned obnoví seznam zboží i ceny
-    const checkoutModal = document.getElementById('checkoutModal');
-    if (checkoutModal && !checkoutModal.classList.contains('hidden') && currentStep === 1) {
-        renderCheckoutStep1(); 
-    }
-}
         // Logika přidání do košíku
     if (!id || typeof price !== 'number') return;
     const existingItem = cart.find(item => item.id === id);
