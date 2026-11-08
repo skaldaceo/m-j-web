@@ -1227,9 +1227,13 @@ function nextCheckoutStep() {
     } else if (currentStep === 3) {
         currentStep = 4;
         updateStepUI();
-        if (typeof renderOrderSummaryStep4 === 'function') renderOrderSummaryStep4();
+        
+        // MALÉ ZPOŽDĚNÍ: Počká 50ms, než se krok 4 zviditelní, a pak natvrdo načte data z formuláře
+        setTimeout(() => {
+            renderOrderSummaryStep4();
+        }, 50);
+
     } else if (currentStep === 4) {
-        // Až ve 4. kroku se odešle objednávka do Supabase
         if (typeof handleFinalOrderSubmit === 'function') {
             handleFinalOrderSubmit();
         } else if (typeof submitOrder === 'function') {
