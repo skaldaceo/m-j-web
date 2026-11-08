@@ -1634,13 +1634,20 @@ function renderOrderSummaryStep4() {
     const summaryContainer = document.getElementById('summary-step4-content');
     if (!summaryContainer) return;
 
-    // Bezpečné načtení hodnot přímo z inputů 3. kroku
-    const email = document.getElementById('checkout-email')?.value || document.getElementById('reg-email')?.value || 'Nezadáno';
-    const name = document.getElementById('checkout-name')?.value || document.getElementById('reg-jmeno')?.value || 'Nezadáno';
-    const phone = document.getElementById('checkout-phone')?.value || document.getElementById('reg-telefon')?.value || 'Nezadáno';
-    const street = document.getElementById('checkout-street')?.value || document.getElementById('reg-ulice')?.value || 'Nezadáno';
-    const city = document.getElementById('checkout-city')?.value || document.getElementById('reg-mesto')?.value || 'Nezadáno';
-    const zip = document.getElementById('checkout-zip')?.value || document.getElementById('reg-psc')?.value || 'Nezadáno';
+    // Čte z value, a pokud je prázdno, vezme hodnotu z placeholderu
+    const nameEl = document.getElementById('checkout-name');
+    const emailEl = document.getElementById('checkout-email');
+    const phoneEl = document.getElementById('checkout-phone');
+    const streetEl = document.getElementById('checkout-street');
+    const cityEl = document.getElementById('checkout-city');
+    const zipEl = document.getElementById('checkout-zip');
+
+    const name = nameEl?.value.trim() || nameEl?.placeholder || 'Martin Skalický';
+    const email = emailEl?.value.trim() || emailEl?.placeholder || 'm7skalicky@gmail.com';
+    const phone = phoneEl?.value.trim() || phoneEl?.placeholder || '+420 737 657 757';
+    const street = streetEl?.value.trim() || streetEl?.placeholder || 'Sulanského 695/4';
+    const city = cityEl?.value.trim() || cityEl?.placeholder || 'Praha 11';
+    const zip = zipEl?.value.trim() || zipEl?.placeholder || '14900';
 
     const isCompany = document.getElementById('is-company-check')?.checked;
     const companyName = document.getElementById('company-name')?.value;
