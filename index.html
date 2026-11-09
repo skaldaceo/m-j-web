@@ -181,6 +181,32 @@
         </div>
     </section>
 
+    <!-- SEKCEMOJE OBJEDNÁVKY (NOVÁ SAMOSTATNÁ LIŠTA/STRÁNKA) -->
+<section id="moje-objednavky" class="hidden min-h-screen py-12 bg-[#0b0f14] text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <!-- Hlavička sekce -->
+        <div class="flex items-center justify-between border-b border-gray-800 pb-5 mb-8">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-box-archive text-cyan-400"></i> Moje objednávky
+                </h1>
+                <p class="text-sm text-gray-400 mt-1">Kompletní historie a detailní přehled vašich nákupů na SimpleFit Gear</p>
+            </div>
+            <button onclick="hideOrdersSection()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded-xl font-medium transition-colors">
+                ← Zpět na e-shop
+            </button>
+        </div>
+
+        <!-- Kontejner pro seznam s detaily -->
+        <div id="detailed-user-orders-list" class="space-y-4">
+            <div class="text-center py-12 text-gray-400">
+                <i class="fa-solid fa-spinner fa-spin text-cyan-400 text-2xl mb-3 block"></i>
+                Načítám detailní přehled objednávek...
+            </div>
+        </div>
+    </div>
+</section>
+
     <!-- Sekce O nás -->
     <section id="o-nas" class="py-24 bg-gradient-to-b from-[#161920] to-[#0f1115] relative overflow-hidden">
         <!-- Vodoznak loga v pozadí -->
