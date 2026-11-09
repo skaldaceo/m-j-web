@@ -1713,25 +1713,30 @@ async function handleFinalOrderSubmit() {
         cart = [];
         if (typeof saveAndRenderCart === 'function') saveAndRenderCart();
 
-        // Vytvoření variabilního symbolu z uložené objednávky
+        // Číselná částka a variabilní symbol
         const createdOrder = (insertedOrders && insertedOrders[0]) ? insertedOrders[0] : null;
         const orderId = createdOrder ? createdOrder.id : '1001';
         const vs = orderId.replace(/[^0-9]/g, '').substring(0, 10) || '1001';
-        const totalAmountStr = Number(totalPrice).toFixed(2);
+        const numericAmount = Math.round(Number(totalPrice));
 
-        // Generování QR kódu přes Paylibo pro tvou Raiffeisenbank
+        // Údaje účtu a záložní spolehlivá URL pro QR platbu (český standard SPD)
         const BANK_IBAN = 'CZ4555000000000779805004';
         const BANK_ACCOUNT = '779805004/5500';
-        const qrImageUrl = `https://api.paylibo.com/api/vq/v1/png?iban=${BANK_IBAN}&amount=${totalAmountStr}&currency=CZK&vs=${vs}&message=SimpleFitGear`;
+        
+        const spdData = `SPD*1.0*ACC:${BANK_IBAN}*AM:${numericAmount}.00*CC:CZK*X-VS:${vs}`;
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(spdData)}`;
 
-        // Zobrazení QR platby přímo v modálu
+        // Zobrazení v modálním okně
         const modalContent = document.querySelector('#checkoutModal .p-6') || 
-                     document.querySelector('#checkoutModal > div > div') || 
-                     document.getElementById('checkoutModal') || 
-                     document.getElementById('checkout-modal-content') || 
-                     document.getElementById('checkout-modal');
+                             document.querySelector('#checkoutModal > div > div') || 
+                             document.getElementById('checkoutModal') || 
+                             document.getElementById('checkout-modal-content') || 
+                             document.getElementById('checkout-modal');
 
         if (modalContent) {
+            const modalWrapper = document.getElementById('checkoutModal');
+            if (modalWrapper) modalWrapper.scrollTop = 0;
+
             modalContent.innerHTML = `
                 <div class="text-center space-y-4 py-4 px-2">
                     <div class="w-14 h-14 bg-green-500/10 text-green-400 rounded-full flex items-center justify-center mx-auto text-2xl border border-green-500/20">
@@ -1747,7 +1752,7 @@ async function handleFinalOrderSubmit() {
                         <div class="text-center">
                             <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-2">Zaplaťte pohodlně přes QR kód</span>
                             <div class="bg-white p-3 inline-block rounded-xl shadow-lg border border-gray-700">
-                                <img src="${qrImageUrl}" alt="QR Platba" class="w-44 h-44 mx-auto">
+                                <img src="${qrImageUrl}" alt="QR Platba" class="w-44 h-44 mx-auto object-contain">
                             </div>
                             <p class="text-[11px] text-gray-400 mt-2">Naskenujte v mobilním bankovnictví (Air Bank, ČS, KB, Fio...)</p>
                         </div>
@@ -1767,9 +1772,6 @@ async function handleFinalOrderSubmit() {
                     </div>
                 </div>
             `;
-        } else {
-            alert(`Děkujeme! Vaše objednávka #${orderId.slice(0, 8)} byla přijata. Prosíme o úhradu ${totalAmountStr} Kč na účet ${BANK_ACCOUNT} (VS: ${vs}).`);
-            if (typeof closeCheckoutModal === 'function') closeCheckoutModal();
         }
 
     } catch (err) {
