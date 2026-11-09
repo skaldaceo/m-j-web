@@ -7,7 +7,7 @@
     <!-- Tailwind CSS a FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS SDK (potřebné pro komunikaci s DB) -->
+    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0b0f14] text-white min-h-screen font-sans flex flex-col justify-between">
@@ -49,15 +49,16 @@
     </footer>
 
     <script>
-        const supabaseUrl = 'https://rtqujirvdyzkdnxzvvfa.supabase.co';
-        const supabaseKey = 'sb_publishable_OBJCg-166656Z8CLfQ07jw_4QoqgaZB';
+        // Správná URL (vvfs na konci) a anon klíč z tvého index.html
+        const SUPABASE_URL = 'https://rtqujirvdyzkdnxzvvfs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_OBJCg-166656Z8CLfQ07jw_4QoqgaZB';
         
         let client = null;
 
-        function initClient() {
+        function getClient() {
             if (client) return client;
             if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
-                client = supabase.createClient(supabaseUrl, supabaseKey);
+                client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             } else if (window.supabaseClient) {
                 client = window.supabaseClient;
             }
@@ -73,17 +74,10 @@
             if (!container) return;
 
             try {
-                const db = initClient();
+                const db = getClient();
                 if (!db || typeof db.from !== 'function') {
                     throw new Error("Nepodařilo se připojit k Supabase.");
                 }
-
-                // Načtení e-mailu
-                let userEmail = 'm7skalicky@gmail.com';
-                try {
-                    const { data: { user } } = await db.auth.getUser();
-                    if (user && user.email) userEmail = user.email;
-                } catch (e) {}
 
                 // Načtení z tabulky orders
                 const { data: orders, error } = await db
@@ -93,7 +87,7 @@
 
                 if (error) throw error;
 
-                // Vyfiltrování podle e-mailu
+                // Vyfiltrování podle e-mailu m7skalicky
                 const userOrders = (orders || []).filter(o => 
                     o.customer_email && o.customer_email.toLowerCase().includes('m7skalicky')
                 );
@@ -108,7 +102,7 @@
                     return;
                 }
 
-                // Vykreslení karet objednávek s rozbalovacím detailem
+                // Vykreslení karet objednávek
                 container.innerHTML = userOrders.map((order, idx) => {
                     const date = new Date(order.created_at).toLocaleDateString('cs-CZ', {
                         day: 'numeric',
@@ -202,6 +196,6 @@
                 if (arrowEl) arrowEl.classList.toggle('rotate-180');
             }
         }
-</script>
+    </script>
 </body>
 </html>
