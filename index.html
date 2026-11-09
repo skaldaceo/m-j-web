@@ -1615,12 +1615,90 @@ function updateCheckoutTotals() {
     document.getElementById('summary-grand-total').textContent = `${grandTotal.toLocaleString('cs-CZ')} Kč`;
 }
 
-// Finální odeslání objednávky
-function handleFinalOrderSubmit() {
-    alert("Děkujeme! Vaše objednávka byla úspěšně vytvořena a odeslána.");
-    cart = [];
-    saveAndRenderCart();
-    closeCheckoutModal();
+// Finální odeslání objednávky do Supabase
+async function handleFinalOrderSubmit() {
+    const submitBtn = document.querySelector('#checkout-step-4 button[onclick*="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Odesílám objednávku...';
+    }
+
+    // Načtení dat z formuláře (případně z placeholderů, pokud nebyly vyplněny ručně)
+    const nameEl = document.getElementById('checkout-name');
+    const emailEl = document.getElementById('checkout-email');
+    const phoneEl = document.getElementById('checkout-phone');
+    const streetEl = document.getElementById('checkout-street');
+    const cityEl = document.getElementById('checkout-city');
+    const zipEl = document.getElementById('checkout-zip');
+
+    const customerName = nameEl?.value.trim() || nameEl?.placeholder || 'Martin Skalický';
+    const customerEmail = emailEl?.value.trim() || emailEl?.placeholder || 'm7skalicky@gmail.com';
+    const customerPhone = phoneEl?.value.trim() || phoneEl?.placeholder || '+420 737 657 757';
+    const street = streetEl?.value.trim() || streetEl?.placeholder || 'Sulanského 695/4';
+    const city = cityEl?.value.trim() || cityEl?.placeholder || 'Praha 11';
+    const zip = zipEl?.value.trim() || zipEl?.placeholder || '14900';
+
+    const deliveryAddress = `${street}, ${zip} ${city}`;
+
+    const isCompany = document.getElementById('is-company-check')?.checked || false;
+    const companyName = isCompany ? document.getElementById('company-name')?.value : null;
+    const companyIco = isCompany ? document.getElementById('company-ico')?.value : null;
+
+    // Zjištění zvolené dopravy a platby
+    const shippingMethod = document.querySelector('input[name="shipping-option"]:checked')?.value || 'osobni-odber';
+    const paymentMethod = document.querySelector('input[name="payment-option"]:checked')?.value || 'qr';
+    
+    // Celková cena
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Objekt pro Supabase
+    const orderData = {
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone,
+        delivery_address: deliveryAddress,
+        is_company: isCompany,
+        company_name: companyName,
+        company_ico: companyIco,
+        shipping_method: shippingMethod,
+        zasilkovna_point: typeof selectedZasilkovnaPoint !== 'undefined' ? selectedZasilkovnaPoint : null,
+        payment_method: paymentMethod,
+        total_price: totalPrice,
+        cart_items: cart,
+        status: 'nová'
+    };
+
+    try {
+        // Kontrola, zda máme inicializovaný supabase klient (supabase nebo supabaseClient)
+        const client = typeof supabase !== 'undefined' ? supabase : (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+        
+        if (!client) {
+            throw new Error("Supabase klient není připojen.");
+        }
+
+        const { data, error } = await client
+            .from('orders')
+            .insert([orderData]);
+
+        if (error) throw error;
+
+        cart = [];
+        if (typeof saveAndRenderCart === 'function') saveAndRenderCart();
+
+        alert('Děkujeme! Vaše objednávka byla úspěšně odeslána.');
+        if (typeof closeCheckoutModal === 'function') closeCheckoutModal();
+        else if (typeof closeModals === 'function') closeModals();
+        
+        window.location.reload();
+
+    } catch (err) {
+        console.error('Chyba při odesílání objednávky:', err);
+        alert('Při odesílání objednávky došlo k chybě: ' + err.message);
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Odeslat objednávku ✓';
+        }
+    }
 }
 document.addEventListener('DOMContentLoaded', renderCart);
     
