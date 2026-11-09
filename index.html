@@ -1669,14 +1669,14 @@ async function handleFinalOrderSubmit() {
     };
 
     try {
-        // Kontrola, zda máme inicializovaný supabase klient (supabase nebo supabaseClient)
-        const client = typeof supabase !== 'undefined' ? supabase : (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+        // Správné načtení Supabase klienta
+        const dbClient = window.supabaseClient || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
         
-        if (!client) {
-            throw new Error("Supabase klient není připojen.");
+        if (!dbClient || typeof dbClient.from !== 'function') {
+            throw new Error("Supabase klient není správně inicializován. Zkontroluj inicializaci supabaseClient.");
         }
 
-        const { data, error } = await client
+        const { data, error } = await dbClient
             .from('orders')
             .insert([orderData]);
 
