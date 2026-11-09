@@ -1725,7 +1725,11 @@ async function handleFinalOrderSubmit() {
         const qrImageUrl = `https://api.paylibo.com/api/vq/v1/png?iban=${BANK_IBAN}&amount=${totalAmountStr}&currency=CZK&vs=${vs}&message=SimpleFitGear`;
 
         // Zobrazení QR platby přímo v modálu
-        const modalContent = document.getElementById('checkout-modal-content') || document.querySelector('#checkoutModal .modal-body') || document.getElementById('checkout-modal');
+        const modalContent = document.querySelector('#checkoutModal .p-6') || 
+                     document.querySelector('#checkoutModal > div > div') || 
+                     document.getElementById('checkoutModal') || 
+                     document.getElementById('checkout-modal-content') || 
+                     document.getElementById('checkout-modal');
 
         if (modalContent) {
             modalContent.innerHTML = `
