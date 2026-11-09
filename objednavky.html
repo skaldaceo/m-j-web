@@ -193,6 +193,14 @@
                 if (arrowEl) arrowEl.classList.toggle('rotate-180');
             }
         }
-    </script>
+    // Inicializace Supabase s tvými klíči
+const SUPABASE_URL = 'https://rtqujirvdyzkdnxzvvfa.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_OBJCg-166656Z8CLfQ07jw_4QoqgaZB';
+
+let supabaseClient;
+if (typeof supabase !== 'undefined') {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+</script>
 </body>
 </html>
