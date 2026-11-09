@@ -47,36 +47,52 @@
     <footer class="border-t border-gray-800 py-6 text-center text-xs text-gray-500">
         © 2026 SimpleFit Gear. Všechna práva vyhrazena.
     </footer>
-
+   
     <!-- SKRIPTY PRO SUPABASE A ROZBALOVÁNÍ -->
     <script>
-        // Inicializace Supabase (nahraď případně svými přesnými klíči z index.html)
-        const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_URL.supabase.co'; // Uprav na své URL
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';                 // Uprav na svůj ANON KEY
+        const SUPABASE_URL = 'https://rtqujirvdyzkdnxzvvfa.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_OBJCg-166656Z8CLfQ07jw_4QoqgaZB';
         
-        let supabaseClient;
-        if (typeof supabase !== 'undefined') {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let dbClient = null;
+
+        function getSupabaseClient() {
+            if (dbClient) return dbClient;
+            
+            if (window.supabaseClient) {
+                dbClient = window.supabaseClient;
+            } else if (typeof supabase !== 'undefined') {
+                if (typeof supabase.createClient === 'function') {
+                    dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                } else {
+                    dbClient = supabase;
+                }
+            }
+            return dbClient;
         }
 
-        document.addEventListener('DOMContentLoaded', loadDetailedUserOrders);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Malá pauza pro jistotu, že se SDK knihovna stihla načíst v prohlížeči
+            setTimeout(loadDetailedUserOrders, 300);
+        });
 
         async function loadDetailedUserOrders() {
             const container = document.getElementById('detailed-user-orders-list');
             if (!container) return;
 
             try {
-                const client = supabaseClient || window.supabaseClient;
-                if (!client) throw new Error("Supabase klient není připojen.");
+                const client = getSupabaseClient();
+                if (!client || typeof client.from !== 'function') {
+                    throw new Error("Nepodařilo se inicializovat Supabase klienta.");
+                }
 
-                // Načtení e-mailu
-                let userEmail = 'm7skalicky@gmail.com'; // Defaultní záloha
+                // E-mail pro filtrování
+                let userEmail = 'm7skalicky@gmail.com';
                 try {
                     const { data: { user } } = await client.auth.getUser();
                     if (user && user.email) userEmail = user.email;
                 } catch (e) {}
 
-                // Načtení objednávek ze Supabase
+                // Načtení z tabulky orders
                 const { data: orders, error } = await client
                     .from('orders')
                     .select('*')
@@ -84,7 +100,7 @@
 
                 if (error) throw error;
 
-                // Vyfiltrování pro daný e-mail
+                // Vyfiltrování podle e-mailu
                 const userOrders = (orders || []).filter(o => 
                     o.customer_email && o.customer_email.toLowerCase().includes('m7skalicky')
                 );
@@ -99,7 +115,7 @@
                     return;
                 }
 
-                // Vykreslení karet objednávek
+                // Vykreslení karet objednávek se zobrazením detailu položek
                 container.innerHTML = userOrders.map((order, idx) => {
                     const date = new Date(order.created_at).toLocaleDateString('cs-CZ', {
                         day: 'numeric',
