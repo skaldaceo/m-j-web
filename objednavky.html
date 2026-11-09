@@ -7,7 +7,7 @@
     <!-- Tailwind CSS a FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS SDK -->
+    <!-- Supabase JS SDK (potřebné pro komunikaci s DB) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0b0f14] text-white min-h-screen font-sans flex flex-col justify-between">
@@ -25,7 +25,7 @@
         </div>
     </header>
 
-    <!-- HLAVNÍ OBSAH - MOJE OBJEDNÁVKY -->
+    <!-- HLAVNÍ OBSAH -->
     <main class="max-w-4xl mx-auto px-4 py-10 w-full flex-1">
         <div class="border-b border-gray-800 pb-5 mb-8">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
@@ -47,32 +47,25 @@
     <footer class="border-t border-gray-800 py-6 text-center text-xs text-gray-500">
         © 2026 SimpleFit Gear. Všechna práva vyhrazena.
     </footer>
-   
-    <!-- SKRIPTY PRO SUPABASE A ROZBALOVÁNÍ -->
-    <script>
-        const SUPABASE_URL = 'https://rtqujirvdyzkdnxzvvfa.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_OBJCg-166656Z8CLfQ07jw_4QoqgaZB';
-        
-        let dbClient = null;
 
-        function getSupabaseClient() {
-            if (dbClient) return dbClient;
-            
-            if (window.supabaseClient) {
-                dbClient = window.supabaseClient;
-            } else if (typeof supabase !== 'undefined') {
-                if (typeof supabase.createClient === 'function') {
-                    dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                } else {
-                    dbClient = supabase;
-                }
+    <script>
+        const supabaseUrl = 'https://rtqujirvdyzkdnxzvvfa.supabase.co';
+        const supabaseKey = 'sb_publishable_OBJCg-166656Z8CLfQ07jw_4QoqgaZB';
+        
+        let client = null;
+
+        function initClient() {
+            if (client) return client;
+            if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+                client = supabase.createClient(supabaseUrl, supabaseKey);
+            } else if (window.supabaseClient) {
+                client = window.supabaseClient;
             }
-            return dbClient;
+            return client;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Malá pauza pro jistotu, že se SDK knihovna stihla načíst v prohlížeči
-            setTimeout(loadDetailedUserOrders, 300);
+            setTimeout(loadDetailedUserOrders, 200);
         });
 
         async function loadDetailedUserOrders() {
@@ -80,20 +73,20 @@
             if (!container) return;
 
             try {
-                const client = getSupabaseClient();
-                if (!client || typeof client.from !== 'function') {
-                    throw new Error("Nepodařilo se inicializovat Supabase klienta.");
+                const db = initClient();
+                if (!db || typeof db.from !== 'function') {
+                    throw new Error("Nepodařilo se připojit k Supabase.");
                 }
 
-                // E-mail pro filtrování
+                // Načtení e-mailu
                 let userEmail = 'm7skalicky@gmail.com';
                 try {
-                    const { data: { user } } = await client.auth.getUser();
+                    const { data: { user } } = await db.auth.getUser();
                     if (user && user.email) userEmail = user.email;
                 } catch (e) {}
 
                 // Načtení z tabulky orders
-                const { data: orders, error } = await client
+                const { data: orders, error } = await db
                     .from('orders')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -115,7 +108,7 @@
                     return;
                 }
 
-                // Vykreslení karet objednávek se zobrazením detailu položek
+                // Vykreslení karet objednávek s rozbalovacím detailem
                 container.innerHTML = userOrders.map((order, idx) => {
                     const date = new Date(order.created_at).toLocaleDateString('cs-CZ', {
                         day: 'numeric',
