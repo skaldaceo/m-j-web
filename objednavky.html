@@ -217,7 +217,7 @@ let qrHtml = '';
     </div>
     
    <!-- QR kód pro dodatečnou úhradu -->
-        ${order.payment_method === 'qr' ? `
+        ${String(order.payment_method).trim().toLowerCase() === 'qr' ? `
             <div class="mt-4 p-4 bg-[#12151b] border border-cyan-500/20 rounded-xl flex items-center justify-between">
                 <div>
                     <h4 class="text-cyan-400 font-bold text-sm mb-1">Dodatečná úhrada objednávky</h4>
