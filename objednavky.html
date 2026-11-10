@@ -184,6 +184,43 @@ const vs = order.id.replace(/[^0-9]/g, '').substring(0, 10) || '1001';
                                         <div class="text-gray-500 font-medium mb-1">Doprava a platba:</div>
                                         <div class="text-gray-300"><b class="text-white">Doprava:</b> ${order.shipping_method || 'Standardní'}</div>
                                         <div class="text-gray-300"><b class="text-white">Platba:</b> ${order.payment_method || 'QR platba / Převod'}</div>
+                                    <div id="order-detail-${idx}" class="hidden border-t border-gray-800/80 p-5 bg-[#10141b] space-y-5">
+    <div>
+        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Zakoupené produkty</h4>
+        <div class="space-y-2">
+            ${itemsListHtml}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-[#151b24] p-4 rounded-xl border border-gray-800">
+        <div>
+            <div class="text-gray-500 font-medium mb-1">Doručovací údaje:</div>
+            <div class="font-bold text-white">${order.customer_name}</div>
+            <div class="text-gray-300">${order.delivery_address || 'Adresa neuvedena'}</div>
+            <div class="text-gray-400 mt-1">${order.customer_email} • ${order.customer_phone}</div>
+        </div>
+        <div>
+            <div class="text-gray-500 font-medium mb-1">Doprava a platba:</div>
+            <div class="text-gray-300"><b class="text-white">Doprava:</b> ${order.shipping_method || 'Standardní'}</div>
+            <div class="text-gray-300"><b class="text-white">Platba:</b> ${order.payment_method || 'QR platba / Převod'}</div>
+        </div>
+    </div>
+
+    <!-- TADY SE VLOŽÍ QR KÓD PRO DODATEČNOU ÚHRADU -->
+    ${order.payment_method === 'qr' ? `
+        <div class="p-4 bg-[#12151b] border border-cyan-500/20 rounded-xl flex items-center justify-between">
+            <div>
+                <h4 class="text-cyan-400 font-bold text-sm mb-1">Dodatečná úhrada objednávky</h4>
+                <p class="text-xs text-gray-400 max-w-[250px] leading-relaxed">Pokud jste ještě neuhradili za objednávku, prosíme o rychlé uhrazení.</p>
+                <div class="text-white font-extrabold text-sm mt-2">Celkem k úhradě: ${Math.round(Number(order.total_price)).toLocaleString('cs-CZ')} Kč</div>
+            </div>
+            <div class="bg-white p-2 rounded-xl shadow-lg border border-gray-700">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`SPD*1.0*ACC:CZ4555000000000779805004*AM:${Math.round(Number(order.total_price))}.00*CC:CZK*X-VS:${order.id.replace(/[^0-9]/g, '').substring(0, 10) || '1001'}`)}" alt="QR Platba" class="w-20 h-20 object-contain">
+            </div>
+        </div>
+    ` : ''}
+
+</div>
                                     </div>
                                 </div>
                             </div>
