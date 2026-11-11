@@ -1008,11 +1008,16 @@ window.addEventListener('click', function(e) {
 });
     
 // Tiché odhlášení bez hlášky a restart do původního stavu
-async function handleLogout() {
-    toggleProfileDropdown();
-    await supabaseClient.auth.signOut();
-    window.location.reload();
-}
+        async function handleLogout() {
+            toggleProfileDropdown();
+            
+            // SMAZÁNÍ STARÝCH ÚDAJŮ Z PAMĚTI PROHLÍŽEČE
+            localStorage.removeItem('checkoutFormData');
+            
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+    
 // Načtení košíku z paměti
 let cart = [];
 try {
