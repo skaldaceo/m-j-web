@@ -1018,6 +1018,55 @@ window.addEventListener('click', function(e) {
             window.location.reload();
         }
     
+// Nová funkce pro bezpečné načtení a vyčištění fakturačních údajů
+async function predvyplnitFakturacniUdaje() {
+    // 1. Vyčistíme zbytky ve formuláři, aby se účty nemíchaly
+    const fieldsToClear = ['reg-jmeno', 'reg-prijmeni', 'reg-telefon', 'reg-ulice', 'reg-mesto', 'reg-psc', 'reg-firma', 'reg-email'];
+    fieldsToClear.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+
+    try {
+        // 2. Kdo je právě teď přihlášený?
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        
+        if (userError || !user) {
+            console.log("Nikdo není přihlášen, pokladna zůstane prázdná.");
+            return; // Pokud není přihlášen, necháme vyčištěno a končíme
+        }
+
+        // 3. Stáhneme údaje pro tohoto konkrétního uživatele
+        const { data: profile, error: dbError } = await supabaseClient
+            .from('fakturacni_udaje')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+        if (dbError) {
+            console.error("Chyba při stahování údajů:", dbError);
+            return;
+        }
+
+        // 4. Naplníme políčka POUZE pokud záznam existuje
+        if (profile) {
+            if (document.getElementById('reg-jmeno')) document.getElementById('reg-jmeno').value = profile.jmeno || '';
+            if (document.getElementById('reg-prijmeni')) document.getElementById('reg-prijmeni').value = profile.prijmeni || '';
+            if (document.getElementById('reg-telefon')) document.getElementById('reg-telefon').value = profile.telefon || '';
+            if (document.getElementById('reg-ulice')) document.getElementById('reg-ulice').value = profile.ulice || '';
+            if (document.getElementById('reg-mesto')) document.getElementById('reg-mesto').value = profile.mesto || '';
+            if (document.getElementById('reg-psc')) document.getElementById('reg-psc').value = profile.psc || '';
+            if (document.getElementById('reg-firma')) document.getElementById('reg-firma').value = profile.firma || '';
+        }
+        
+        // E-mail můžeme vyplnit vždy z Auth modulu
+        if (document.getElementById('reg-email')) document.getElementById('reg-email').value = user.email || '';
+
+    } catch (err) {
+        console.error("Došlo k chybě při předvyplňování:", err);
+    }
+}
+    
 // Načtení košíku z paměti
 let cart = [];
 try {
