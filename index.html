@@ -1719,17 +1719,20 @@ async function handleFinalOrderSubmit() {
         // Zobrazení normální děkovné karty na stránce (bez ztmavovacího popupu a křížku)
         const modalContent = document.querySelector('#checkoutModal');
         
+       // Zrušíme starý modal, aby nikde nestrašil
         if (modalContent) {
-            // KROK 2: Schování produktů a odskrolování nahoru
-            const mainShop = document.querySelector('main');
-            if (mainShop) mainShop.classList.add('hidden');
-            window.scrollTo(0, 0);
-            // Odstranění ztmavovacího pozadí vyskakovacího okna
-            modalContent.className = "w-full py-10 bg-[#0b0f14]";
-            modalContent.scrollTop = 0;
+            modalContent.style.display = 'none';
+        }
+
+        // Vložíme děkovnou kartu přímo na místo obchodu (do <main>)
+        const mainShop = document.querySelector('main');
+        if (mainShop) {
+            mainShop.classList.remove('hidden'); // Ujistíme se, že je vidět
+            window.scrollTo(0, 0); // Vyjedeme nahoru
             
-            modalContent.innerHTML = `
-                <div class="max-w-md mx-auto px-4">
+            // Nahradíme obsah (produkty/košík) děkovnou obrazovkou
+            mainShop.innerHTML = `
+                <div class="max-w-md mx-auto px-4 py-10 w-full">
                     <div class="bg-[#141921] border border-cyan-500/30 p-8 rounded-3xl text-center shadow-2xl space-y-5">
                         
                         <!-- Zelená ikonka -->
