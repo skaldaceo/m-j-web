@@ -1720,6 +1720,10 @@ async function handleFinalOrderSubmit() {
         const modalContent = document.querySelector('#checkoutModal');
         
         if (modalContent) {
+            // KROK 2: Schování produktů a odskrolování nahoru
+            const mainShop = document.querySelector('main');
+            if (mainShop) mainShop.classList.add('hidden');
+            window.scrollTo(0, 0);
             // Odstranění ztmavovacího pozadí vyskakovacího okna
             modalContent.className = "w-full py-10 bg-[#0b0f14]";
             modalContent.scrollTop = 0;
