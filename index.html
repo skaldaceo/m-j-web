@@ -1716,23 +1716,15 @@ async function handleFinalOrderSubmit() {
         const spdData = `SPD*1.0*ACC:${BANK_IBAN}*AM:${numericAmount}.00*CC:CZK*X-VS:${vs}`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(spdData)}`;
 
-        // Zobrazení normální děkovné karty na stránce (bez ztmavovacího popupu a křížku)
         const modalContent = document.querySelector('#checkoutModal');
         
-       // Zrušíme starý modal, aby nikde nestrašil
         if (modalContent) {
-            modalContent.style.display = 'none';
-        }
-
-        // Vložíme děkovnou kartu přímo na místo obchodu (do <main>)
-        const mainShop = document.querySelector('main');
-        if (mainShop) {
-            mainShop.classList.remove('hidden'); // Ujistíme se, že je vidět
-            window.scrollTo(0, 0); // Vyjedeme nahoru
+            // ZMĚNA NA PLNOU STRÁNKU: Přemažeme třídy modalu tak, aby měl 100% neprůhledné pozadí v barvě e-shopu
+            modalContent.className = "fixed inset-0 bg-[#0b0f14] z-[100] overflow-y-auto pt-20 px-4 pb-10";
+            modalContent.scrollTop = 0;
             
-            // Nahradíme obsah (produkty/košík) děkovnou obrazovkou
-            mainShop.innerHTML = `
-                <div class="max-w-md mx-auto px-4 py-10 w-full">
+            modalContent.innerHTML = `
+                <div class="max-w-md mx-auto w-full">
                     <div class="bg-[#141921] border border-cyan-500/30 p-8 rounded-3xl text-center shadow-2xl space-y-5">
                         
                         <!-- Zelená ikonka -->
@@ -1748,7 +1740,7 @@ async function handleFinalOrderSubmit() {
 
                         <!-- Popisek pro platbu -->
                         <p class="text-xs text-gray-300 max-w-xs mx-auto leading-relaxed">
-                            Prosím hradte tuto částku, abychom mohli co nejrychleji zpracovat Vaši objednávku.
+                            Prosím uhraďte tuto částku, abychom mohli co nejrychleji zpracovat Vaši objednávku.
                         </p>
 
                         <!-- QR kód -->
