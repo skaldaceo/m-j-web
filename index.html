@@ -1895,21 +1895,6 @@ function toggleCompanyFields() {
     }
 }
 
-// 2. Automatické předvyplnění údajů z přihlášení (Supabase)
-async function autoFillUserData() {
-    if (typeof supabaseClient !== 'undefined') {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user) {
-            if (document.getElementById('checkout-email')) document.getElementById('checkout-email').value = user.email || '';
-            if (document.getElementById('checkout-name')) document.getElementById('checkout-name').value = user.user_metadata?.full_name || 'Martin Skalický';
-            if (document.getElementById('checkout-phone')) document.getElementById('checkout-phone').value = user.user_metadata?.phone || '+420 737 657 757';
-            if (document.getElementById('checkout-street')) document.getElementById('checkout-street').value = user.user_metadata?.street || 'Sulanského 695/4';
-            if (document.getElementById('checkout-city')) document.getElementById('checkout-city').value = user.user_metadata?.city || 'Prague';
-            if (document.getElementById('checkout-zip')) document.getElementById('checkout-zip').value = user.user_metadata?.zip || '14900';
-        }
-    }
-}
-
 // 3. Vykreslení přehledu v 4. kroku (Shrnutí objednávky)
 function renderOrderSummaryStep4() {
     const summaryContainer = document.getElementById('summary-step4-content');
@@ -1922,12 +1907,12 @@ function renderOrderSummaryStep4() {
     const cityEl = document.getElementById('checkout-city');
     const zipEl = document.getElementById('checkout-zip');
 
-    const name = nameEl?.value.trim() || nameEl?.placeholder || 'Martin Skalický';
-    const email = emailEl?.value.trim() || emailEl?.placeholder || 'm7skalicky@gmail.com';
-    const phone = phoneEl?.value.trim() || phoneEl?.placeholder || '+420 737 657 757';
-    const street = streetEl?.value.trim() || streetEl?.placeholder || 'Sulanského 695/4';
-    const city = cityEl?.value.trim() || cityEl?.placeholder || 'Praha 11';
-    const zip = zipEl?.value.trim() || zipEl?.placeholder || '14900';
+    const name = nameEl?.value.trim() || nameEl?.placeholder || '';
+        const email = emailEl?.value.trim() || emailEl?.placeholder || '';
+        const phone = phoneEl?.value.trim() || phoneEl?.placeholder || '';
+        const street = streetEl?.value.trim() || streetEl?.placeholder || '';
+        const city = cityEl?.value.trim() || cityEl?.placeholder || '';
+        const zip = zipEl?.value.trim() || zipEl?.placeholder || '';
 
     const isCompany = document.getElementById('is-company-check')?.checked;
     const companyName = document.getElementById('company-name')?.value;
