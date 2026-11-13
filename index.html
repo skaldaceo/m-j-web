@@ -1059,6 +1059,10 @@ async function predvyplnitFakturacniUdaje() {
             if (document.getElementById('checkout-city')) document.getElementById('checkout-city').value = profile.mesto || '';
             if (document.getElementById('checkout-zip')) document.getElementById('checkout-zip').value = profile.psc || '';
             
+            // Dynamické přepsání adresy u Zásilkovny (krok 2)
+            const adresaZasilkovna = document.getElementById('user-delivery-address-display');
+            if (adresaZasilkovna) adresaZasilkovna.innerText = `Doručit na: ${profile.ulice || ''}, ${profile.mesto || ''}`;
+            
             // Pokud máš v pokladně políčko pro firmu (zkusil jsem odhadnout ID 'checkout-company', pokud ho tam nemáš, tak se nic nestane)
             if (document.getElementById('checkout-company')) document.getElementById('checkout-company').value = profile.firma || '';
         }
