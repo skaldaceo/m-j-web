@@ -1345,7 +1345,7 @@ function nextCheckoutStep() {
     } else if (currentStep === 2) {
         currentStep = 3;
         updateStepUI();
-        if (typeof autoFillUserData === 'function') autoFillUserData();
+       if (typeof predvyplnitFakturacniUdaje === 'function') predvyplnitFakturacniUdaje();
     } else if (currentStep === 3) {
         currentStep = 4;
         updateStepUI();
