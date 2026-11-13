@@ -1299,30 +1299,14 @@ function nextCheckoutStep() {
         currentStep = 3;
         updateStepUI();
        if (typeof predvyplnitFakturacniUdaje === 'function') predvyplnitFakturacniUdaje();
-    } else if (currentStep === 3) {
-        // Zkontrolujeme, zda jsou všechna hlavní políčka vyplněná
-        const name = document.getElementById('checkout-name')?.value.trim();
-        const email = document.getElementById('checkout-email')?.value.trim();
-        const phone = document.getElementById('checkout-phone')?.value.trim();
-        const street = document.getElementById('checkout-street')?.value.trim();
-        const city = document.getElementById('checkout-city')?.value.trim();
-        const zip = document.getElementById('checkout-zip')?.value.trim();
-
-        if (!name || !email || !phone || !street || !city || !zip) {
-            if (typeof showAlert === 'function') {
-                showAlert('Vyplňte prosím všechna povinná pole.');
-            } else {
-                alert('Vyplňte prosím všechna povinná pole.');
-            }
-            return; // Zastaví postup a nepustí uživatele dál
-        }
-
+   } else if (currentStep === 3) {
         currentStep = 4;
         updateStepUI();
+        
+        // MALE ZPOZDENI: Pocká 50ms, než se krok 4 zviditelní, a pak natvrdo načte data z formuláře
         setTimeout(() => {
             renderOrderSummaryStep4();
         }, 50);
-    }
 
     } else if (currentStep === 4) {
         if (typeof handleFinalOrderSubmit === 'function') {
