@@ -1069,57 +1069,6 @@ async function predvyplnitFakturacniUdaje() {
     } catch (err) {
         console.error("Došlo k chybě při předvyplňování:", err);
     }
-}// Nová funkce pro bezpečné načtení a vyčištění fakturačních údajů V POKLADNĚ
-async function predvyplnitFakturacniUdaje() {
-    // 1. Vyčistíme stará data z políček v pokladně
-    const fieldsToClear = ['checkout-name', 'checkout-phone', 'checkout-street', 'checkout-city', 'checkout-zip', 'checkout-company', 'checkout-email'];
-    fieldsToClear.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-
-    try {
-        // 2. Kdo je přihlášený?
-        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-        
-        if (userError || !user) {
-            console.log("Nikdo není přihlášen, pokladna zůstane prázdná.");
-            return; 
-        }
-
-        // 3. Stáhneme údaje pro tohoto konkrétního uživatele
-        const { data: profile, error: dbError } = await supabaseClient
-            .from('fakturacni_udaje')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-        if (dbError) {
-            console.error("Chyba při stahování údajů:", dbError);
-            return;
-        }
-
-        // 4. Naplníme políčka POUZE pokud záznam existuje
-        if (profile) {
-            // Tady spojíme jméno a příjmení dohromady, protože v databázi je máš zvlášť, ale v pokladně je jedno políčko "Jméno a příjmení"
-            const celeJmeno = (profile.jmeno || '') + ' ' + (profile.prijmeni || '');
-            if (document.getElementById('checkout-name')) document.getElementById('checkout-name').value = celeJmeno.trim();
-            
-            if (document.getElementById('checkout-phone')) document.getElementById('checkout-phone').value = profile.telefon || '';
-            if (document.getElementById('checkout-street')) document.getElementById('checkout-street').value = profile.ulice || '';
-            if (document.getElementById('checkout-city')) document.getElementById('checkout-city').value = profile.mesto || '';
-            if (document.getElementById('checkout-zip')) document.getElementById('checkout-zip').value = profile.psc || '';
-            
-            // Pokud máš v pokladně políčko pro firmu (zkusil jsem odhadnout ID 'checkout-company', pokud ho tam nemáš, tak se nic nestane)
-            if (document.getElementById('checkout-company')) document.getElementById('checkout-company').value = profile.firma || '';
-        }
-        
-        // E-mail můžeme vyplnit vždy z Auth modulu
-        if (document.getElementById('checkout-email')) document.getElementById('checkout-email').value = user.email || '';
-
-    } catch (err) {
-        console.error("Došlo k chybě při předvyplňování:", err);
-    }
 }
     
 // Načtení košíku z paměti
