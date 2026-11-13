@@ -1300,6 +1300,41 @@ function nextCheckoutStep() {
         updateStepUI();
        if (typeof predvyplnitFakturacniUdaje === 'function') predvyplnitFakturacniUdaje();
    } else if (currentStep === 3) {
+        // --- ZAČÁTEK VALIDACE 3. KROKU ---
+        const email = document.getElementById('checkout-email')?.value.trim();
+        const name = document.getElementById('checkout-name')?.value.trim();
+        const phone = document.getElementById('checkout-phone')?.value.trim();
+        const street = document.getElementById('checkout-street')?.value.trim();
+        const city = document.getElementById('checkout-city')?.value.trim();
+        const zip = document.getElementById('checkout-zip')?.value.trim();
+        
+        // Pokud je zaškrtnuto "Nakupuji na firmu", chceme zkontrolovat i firmu a IČO
+        const isCompany = document.getElementById('is-company-check')?.checked;
+        const companyName = document.getElementById('company-name')?.value.trim();
+        const companyIco = document.getElementById('company-ico')?.value.trim();
+
+        let isValid = true;
+        let errorMessage = 'Vyplňte prosím všechna povinná pole.';
+
+        // Kontrola základních polí
+        if (!email || !name || !phone || !street || !city || !zip) {
+            isValid = false;
+        }
+
+        // Kontrola firemních polí (pokud je zaškrtnuto)
+        if (isCompany && (!companyName || !companyIco)) {
+            isValid = false;
+            errorMessage = 'Vyplňte prosím fakturační údaje firmy (Název a IČO).';
+        }
+
+        // Pokud to není validní, ukážeme chybu a NEPUSTÍME uživatele dál
+        if (!isValid) {
+            alert(errorMessage);
+            return; // ZASTAVÍ funkci, takže se neprovede currentStep = 4
+        }
+        // --- KONEC VALIDACE 3. KROKU ---
+
+        // Pokud je vše ok, pustíme ho dál
         currentStep = 4;
         updateStepUI();
         
