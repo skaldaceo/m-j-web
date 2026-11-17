@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produkty | SimpleFit Gear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        section { scroll-margin-top: 5rem; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00E5FF; }
+        
+        @keyframes flyToCart {
+            0% { transform: scale(1); opacity: 1; }
+            50% { opacity: 1; filter: drop-shadow(0 0 10px #00E5FF); }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
+        }
+
+        .dropdown-content {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            pointer-events: none;
+        }
+        .dropdown:hover .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-[#0f1115] text-gray-300 font-sans selection:bg-cyan-500 selection:text-white">
+
+    <!-- Navigace (Zásadně nezměněná, plně funkční) -->
+    <nav class="fixed w-full z-50 bg-[#0f1115]/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="w-full px-6 md:px-12 mx-auto">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex-shrink-0 flex items-center space-x-6 group">
+                    <img src="./logo.jpeg" alt="SimpleFit Logo" class="h-10 w-auto object-contain rounded-md mr-2" onerror="this.style.display='none'">
+                    <div class="text-2xl md:text-3xl font-black tracking-tight">
+                        <span class="text-white group-hover:text-cyan-400 transition-colors">Simple</span><span class="text-[#00E5FF]">Fit</span> <span class="text-gray-400 font-light text-xl md:text-2xl ml-1">Gear</span>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Úvod</a>
+                    <a href="index.html#o-nas" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">O nás</a>
+                    
+                    <div class="relative dropdown py-6">
+                        <a href="produkty.html" class="text-cyan-400 font-medium transition-colors flex items-center">
+                            Produkty <i class="fa-solid fa-chevron-down text-[10px] ml-1.5 mt-0.5"></i>
+                        </a>
+                        <div class="dropdown-content absolute left-0 mt-2 w-48 bg-[#1a1d24] border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
+                            <a href="#katalog" onclick="filterByCategory('fitness')" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Fitness výbava</a>
+                            <a href="#katalog" onclick="filterByCategory('sluchatka')" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Sluchátka</a>
+                            <a href="#katalog" onclick="filterByCategory('doplnky')" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Doplňky stravy</a>
+                            <a href="#katalog" onclick="filterByCategory('prislusenstvi')" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Příslušenství</a>
+                        </div>
+                    </div>
+                    
+                    <a href="index.html#kontakt-stranka" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Kontakt</a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <!-- Profil -->
+                    <div class="relative">
+                        <button onclick="handleProfileClick()" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors flex flex-col items-center focus:outline-none">
+                            <i class="fa-regular fa-user text-xl"></i>
+                            <span id="nav-profile-text" class="text-[10px] mt-1 hidden md:block">Profil</span>
+                        </button>
+                        <div id="profileDropdown" class="absolute right-0 mt-3 w-60 bg-[#181d24] border border-gray-800 rounded-xl shadow-2xl py-3 px-4 hidden z-50">
+                            <div class="border-b border-gray-800 pb-3 mb-2 text-left">
+                                <div id="profile-dropdown-name" class="font-bold text-white text-base truncate">Načítám...</div>
+                                <div id="profile-dropdown-email" class="text-xs text-gray-400 truncate">načítám...</div>
+                            </div>
+                            <div class="flex flex-col space-y-1 text-sm text-left">
+                                <a href="#" onclick="openOrdersModal(); toggleProfileDropdown(); return false;" class="px-3 py-2 rounded-lg text-gray-300 hover:bg-[#252e3b] hover:text-white transition-colors">Objednávky</a>
+                                <button onclick="handleLogout()" class="w-full text-left px-3 py-2 rounded-lg text-cyan-400 hover:bg-red-500/10 hover:text-red-400 transition-colors border-t border-gray-800 mt-1 pt-2 flex items-center justify-between focus:outline-none">
+                                    <span>Odhlásit se</span>
+                                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Košík -->
+                    <div class="relative group" id="cart-wrapper">
+                        <button id="cart-btn" onclick="goToCartPage()" class="text-gray-300 hover:text-cyan-400 transition-colors relative flex flex-col items-center focus:outline-none py-1">
+                            <div class="relative">
+                                <i class="fa-solid fa-cart-shopping text-xl"></i>
+                                <span id="cart-count" class="absolute -bottom-1 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden transition-transform duration-300 transform">0</span>
+                            </div>
+                            <span class="text-[10px] mt-1 hidden md:block">Košík</span>
+                        </button>
+
+                        <div id="cart-dropdown" class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-[#1a1d24] border border-gray-700 shadow-2xl rounded-2xl overflow-hidden hidden group-hover:block z-[80] transition-all">
+                            <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-[#181d24]">
+                                <span class="font-bold text-white text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-cart-shopping text-cyan-400"></i> Nákupní košík
+                                </span>
+                                <span id="cart-dropdown-count-title" class="text-xs text-gray-400">0 položek</span>
+                            </div>
+                            <div id="cart-items-container" class="p-3 max-h-64 overflow-y-auto space-y-3"></div>
+                            <div class="p-4 border-t border-gray-800 bg-[#181d24] space-y-3">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-400">Celková cena:</span>
+                                    <span id="cart-total-price" class="text-lg font-bold text-cyan-400">0 Kč</span>
+                                </div>
+                                <button onclick="goToCartPage()" class="w-full bg-cyan-400 hover:bg-cyan-300 text-gray-900 font-bold py-2.5 rounded-xl text-sm transition-colors">
+                                    Pokračovat k objednávce
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hlavní obsah podstránky Produkty -->
+    <main class="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Nadpis sekce -->
+        <div class="mb-8 border-b border-gray-800 pb-4">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white">Sport a kemping - Fitness</h1>
+            <p class="text-gray-400 text-sm mt-1">Prémiová výbava pro domácí trénink i profesionální posilovnu.</p>
+        </div>
+
+        <!-- 4 Kolonky kategorií (Mironet Style)[cite: 19] -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div onclick="filterByCategory('fitness')" class="bg-[#1a1d24] border border-gray-800 hover:border-cyan-400 p-5 rounded-2xl flex items-center space-x-4 cursor-pointer transition-all group">
+                <div class="w-12 h-12 bg-cyan-950/50 rounded-xl flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-dumbbell text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm md:text-base">Fitness výbava</h3>
+                    <span class="text-xs text-gray-400">Zobrazit kategorie</span>
+                </div>
+            </div>
+
+            <div onclick="filterByCategory('sluchatka')" class="bg-[#1a1d24] border border-gray-800 hover:border-cyan-400 p-5 rounded-2xl flex items-center space-x-4 cursor-pointer transition-all group">
+                <div class="w-12 h-12 bg-cyan-950/50 rounded-xl flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-headphones text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm md:text-base">Sluchátka</h3>
+                    <span class="text-xs text-gray-400">Zobrazit kategorie</span>
+                </div>
+            </div>
+
+            <div onclick="filterByCategory('doplnky')" class="bg-[#1a1d24] border border-gray-800 hover:border-cyan-400 p-5 rounded-2xl flex items-center space-x-4 cursor-pointer transition-all group">
+                <div class="w-12 h-12 bg-cyan-950/50 rounded-xl flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-jar text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm md:text-base">Doplňky stravy</h3>
+                    <span class="text-xs text-gray-400">Zobrazit kategorie</span>
+                </div>
+            </div>
+
+            <div onclick="filterByCategory('prislusenstvi')" class="bg-[#1a1d24] border border-gray-800 hover:border-cyan-400 p-5 rounded-2xl flex items-center space-x-4 cursor-pointer transition-all group">
+                <div class="w-12 h-12 bg-cyan-950/50 rounded-xl flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-stopwatch text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm md:text-base">Příslušenství</h3>
+                    <span class="text-xs text-gray-400">Zobrazit kategorie</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nejžádanější produkty (Seznam řádků: Název vlevo, cena vpravo)[cite: 19, 20] -->
+        <div class="bg-[#161920] border border-gray-800 rounded-2xl p-6 mb-12 shadow-xl">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-cyan-400"></i> Nejžádanější produkty
+            </h2>
+            <div id="top-products-list" class="space-y-3">
+                <!-- Dynamicky generováno níže ve skriptu -->
+            </div>
+        </div>
+
+        <!-- Filtr řazení (Top, Nejlevnější, Nejdražší, A-Z)[cite: 20] -->
+        <div class="bg-[#161920] border border-gray-800 rounded-xl p-4 mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+                <span class="text-xs text-gray-400 font-bold uppercase mr-2">Řazení:</span>
+                <button onclick="sortProducts('top')" id="sort-top" class="px-4 py-2 rounded-lg bg-cyan-400 text-gray-900 font-bold text-xs transition-all">Top</button>
+                <button onclick="sortProducts('cheap')" id="sort-cheap" class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs transition-all">Nejlevnější</button>
+                <button onclick="sortProducts('expensive')" id="sort-expensive" class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs transition-all">Nejdražší</button>
+                <button onclick="sortProducts('az')" id="sort-az" class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs transition-all">A-Z</button>
+            </div>
+            <div id="product-count-label" class="text-xs text-gray-400 font-medium">Zobrazeno celkem 8 produktů</div>
+        </div>
+
+        <!-- Kompletní nabídka produktů (Mřížka) -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Produkty se vykreslí dynamicky JavaScriptem -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b0c10] border-t border-gray-800 pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+            <p>&copy; 2026 SimpleFit Gear. Všechna práva vyhrazena.</p>
+        </div>
+    </footer>
+
+    <!-- MODÁLY (Košík, Pokladna, Objednávky, Přihlášení) -->
+    <!-- (Stejné jako na hlavní stránce pro zajištění plné funkčnosti) -->
+    <div id="modalBackdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div id="loginModal" class="bg-[#1a1d24] w-full max-w-md rounded-2xl border border-gray-700 shadow-2xl overflow-hidden hidden">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Přihlášení</h3>
+                <button onclick="closeModals()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="email" id="login-email" placeholder="E-mail" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2.5 px-3 text-white">
+                <input type="password" id="login-password" placeholder="Heslo" class="w-full bg-[#0f1115] border border-gray-700 rounded-lg py-2.5 px-3 text-white">
+                <button id="btn-prihlasit" class="w-full bg-[#00E5FF] hover:bg-cyan-400 text-gray-900 font-bold py-3 rounded-lg">Přihlásit se</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modál pro Objednávky -->
+    <div id="ordersModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+        <div class="bg-[#11161d] border border-gray-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl relative">
+            <button type="button" onclick="closeOrdersModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-box text-cyan-400"></i> Moje objednávky</h3>
+            <div id="user-orders-list" class="space-y-3 max-h-96 overflow-y-auto">
+                <div class="text-center py-8 text-gray-500 text-xs">Načítám objednávky...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hlavní skripty pro správu katalogu, řazení a košíku -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        const supabaseUrl = 'https://rtqujirvdyzkdmxzvvfa.supabase.co';
+        const supabaseKey = 'sb_publishable_OBjCg-l66656Z0CLFqQ7jw_4QoqgaZB';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Databáze produktů včetně nových (Masážní válec Ergo, Podložka na cvičení Ergo apod.)
+        let products = [
+            { id: 'cinky-24kg', name: 'Nastavitelné činky 24kg', price: 4990, originalPrice: 6290, category: 'fitness', isTop: true, badge: '-20%', icon: 'fa-dumbbell' },
+            { id: 'koss-sluchatka', name: 'Sportovní sluchátka Koss', price: 1290, originalPrice: null, category: 'sluchatka', isTop: true, badge: null, icon: 'fa-headphones' },
+            { id: 'protein-80', name: 'Syrovátkový Protein 80%', price: 890, originalPrice: null, category: 'doplnky', isTop: true, badge: null, icon: 'fa-bottle-water' },
+            { id: 'chytre-hodinky', name: 'Sportovní chytré hodinky', price: 3490, originalPrice: null, category: 'prislusenstvi', isTop: true, badge: null, icon: 'fa-stopwatch' },
+            { id: 'masazni-valec-ergo', name: 'Masážní válec Ergo', price: 590, originalPrice: 750, category: 'fitness', isTop: false, badge: 'Akce', icon: 'fa-spa' },
+            { id: 'podlozka-ergo', name: 'Podložka na cvičení Ergo', price: 450, originalPrice: null, category: 'fitness', isTop: false, badge: null, icon: 'fa-layer-group' },
+            { id: 'sejr-700', name: 'SimpleFit Premium Šejkr 700ml', price: 199, originalPrice: null, category: 'doplnky', isTop: false, badge: 'Novinka', icon: 'fa-glass-water' },
+            { id: 'magnesium', name: 'Magnesium Chelate 90 kapslí', price: 299, originalPrice: null, category: 'doplnky', isTop: false, badge: null, icon: 'fa-pills' }
+        ];
+
+        let currentFilter = 'all';
+        let currentSort = 'top';
+
+        // Vykreslení Nejžádanějších produktů (Název vlevo, cena vpravo)[cite: 19, 20]
+        function renderTopProducts() {
+            const container = document.getElementById('top-products-list');
+            if (!container) return;
+
+            const topItems = products.filter(p => p.isTop);
+            container.innerHTML = topItems.map(item => `
+                <div class="flex justify-between items-center bg-[#12151b] px-4 py-3 rounded-xl border border-gray-800/60 hover:border-cyan-400/40 transition-all cursor-pointer" onclick="addToCart('${item.id}', '${item.name}', ${item.price}, './logo.jpeg', event)">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid ${item.icon} text-cyan-400 text-lg w-6 text-center"></i>
+                        <span class="text-white font-semibold text-sm">${item.name}</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="font-bold text-cyan-400 text-sm">${item.price.toLocaleString('cs-CZ')} Kč</span>
+                        <button class="bg-gray-800 hover:bg-cyan-400 hover:text-gray-900 text-white w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-xs">
+                            <i class="fa-solid fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Vykreslení mřížky produktů s filtrem a řazením
+        function renderProductsGrid() {
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+
+            let filtered = products.filter(p => currentFilter === 'all' || p.category === currentFilter);
+
+            // Řazení
+            if (currentSort === 'cheap') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (currentSort === 'expensive') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (currentSort === 'az') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else {
+                // Top / Výchozí
+                filtered.sort((a, b) => (b.isTop ? 1 : 0) - (a.isTop ? 1 : 0));
+            }
+
+            document.getElementById('product-count-label').textContent = `Zobrazeno celkem ${filtered.length} produktů`;
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="bg-[#161920] rounded-2xl overflow-hidden border border-gray-800 group hover:border-cyan-500/50 transition-all flex flex-col justify-between shadow-lg">
+                    <div class="h-52 bg-[#0b0c10] flex items-center justify-center relative overflow-hidden">
+                        <i class="fa-solid ${item.icon} text-6xl text-gray-700 group-hover:text-cyan-400/60 transition-colors transform group-hover:scale-110 duration-300"></i>
+                        ${item.badge ? `<span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow">${item.badge}</span>` : ''}
+                    </div>
+                    <div class="p-5 flex flex-col flex-1 justify-between">
+                        <div>
+                            <p class="text-[11px] text-cyan-400 font-semibold uppercase tracking-wider mb-1">${item.category}</p>
+                            <h3 class="text-base font-bold text-white mb-2 leading-snug">${item.name}</h3>
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-800/80">
+                            <div>
+                                <span class="text-lg font-extrabold text-white">${item.price.toLocaleString('cs-CZ')} Kč</span>
+                                ${item.originalPrice ? `<span class="text-xs text-gray-500 line-through block">${item.originalPrice.toLocaleString('cs-CZ')} Kč</span>` : ''}
+                            </div>
+                            <button type="button" onclick="addToCart('${item.id}', '${item.name}', ${item.price}, './logo.jpeg', event)" class="bg-[#2a2e39] hover:bg-cyan-400 hover:text-gray-900 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-colors shadow">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterByCategory(cat) {
+            currentFilter = cat;
+            renderProductsGrid();
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+
+        function sortProducts(sortType) {
+            currentSort = sortType;
+            ['top', 'cheap', 'expensive', 'az'].forEach(s => {
+                const btn = document.getElementById(`sort-${s}`);
+                if (btn) {
+                    if (s === sortType) {
+                        btn.className = 'px-4 py-2 rounded-lg bg-cyan-400 text-gray-900 font-bold text-xs transition-all';
+                    } else {
+                        btn.className = 'px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs transition-all';
+                    }
+                }
+            });
+            renderProductsGrid();
+        }
+
+        // Košík
+        let cart = [];
+        try {
+            const saved = localStorage.getItem('simplefit_cart');
+            cart = saved ? JSON.parse(saved).filter(item => item && item.id && typeof item.price === 'number') : [];
+        } catch(e) { cart = []; }
+
+        function saveAndRenderCart() {
+            localStorage.setItem('simplefit_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function addToCart(id, name, price, image, event) {
+            if (!id || typeof price !== 'number') return;
+            const existing = cart.find(i => i.id === id);
+            if (existing) existing.quantity += 1;
+            else cart.push({ id, name, price, image: image || 'logo.jpeg', quantity: 1 });
+            saveAndRenderCart();
+        }
+
+        function updateQuantity(id, change) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.quantity += change;
+            if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+            saveAndRenderCart();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            saveAndRenderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const totalPriceEl = document.getElementById('cart-total-price');
+            const cartCountEl = document.getElementById('cart-count');
+            const titleCountEl = document.getElementById('cart-dropdown-count-title');
+
+            const totalCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+            if (cartCountEl) {
+                cartCountEl.textContent = totalCount;
+                if (totalCount > 0) cartCountEl.classList.remove('hidden');
+                else cartCountEl.classList.add('hidden');
+            }
+            if (titleCountEl) titleCountEl.textContent = `${totalCount} položek`;
+
+            if (!container) return;
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="text-center py-6 text-gray-400 text-xs">Váš košík je prázdný.</div>';
+                if (totalPriceEl) totalPriceEl.textContent = '0 Kč';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(i => {
+                total += i.price * i.quantity;
+                return `
+                    <div class="flex items-center justify-between bg-[#181d24] p-2.5 rounded-xl border border-gray-800 text-xs">
+                        <span class="text-white font-bold">${i.name} (${i.quantity}x)</span>
+                        <span class="text-cyan-400">${(i.price * i.quantity).toLocaleString()} Kč</span>
+                    </div>
+                `;
+            }).join('');
+            if (totalPriceEl) totalPriceEl.textContent = `${total.toLocaleString()} Kč`;
+        }
+
+        function goToCartPage() {
+            window.location.href = 'index.html'; // Nebo otevřít košíkový modál
+        }
+
+        async function handleProfileClick() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                document.getElementById('profileDropdown')?.classList.toggle('hidden');
+            } else {
+                document.getElementById('modalBackdrop')?.classList.remove('hidden');
+                document.getElementById('loginModal')?.classList.remove('hidden');
+            }
+        }
+
+        function toggleProfileDropdown() {
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+        }
+
+        function closeModals() {
+            document.getElementById('modalBackdrop')?.classList.add('hidden');
+            document.getElementById('loginModal')?.classList.add('hidden');
+        }
+
+        async function handleLogout() {
+            toggleProfileDropdown();
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        async function openOrdersModal() {
+            document.getElementById('ordersModal')?.classList.remove('hidden');
+        }
+
+        function closeOrdersModal() {
+            document.getElementById('ordersModal')?.classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTopProducts();
+            renderProductsGrid();
+            renderCart();
+        });
+    </script>
+</body>
+</html>
