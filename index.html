@@ -73,23 +73,22 @@
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Úvod</a>
-                    <a href="#o-nas" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">O nás</a>
+                    <a href="#" onclick="zobrazHlavni(); return false;" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Úvod</a>
+                    <a href="#" onclick="zobrazHlavni('onas'); return false;" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">O nás</a>
                     
                     <!-- Dropdown Produkty -->
                     <div class="relative dropdown py-6">
-                        <a href="produkty.html" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors flex items-center">
+                        <a href="#" onclick="zobrazKatalog(); return false;" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors flex items-center">
                             Produkty <i class="fa-solid fa-chevron-down text-[10px] ml-1.5 mt-0.5"></i>
                         </a>
                         <div class="dropdown-content absolute left-0 mt-2 w-48 bg-[#1a1d24] border border-gray-800 rounded-lg shadow-xl overflow-hidden z-50">
-                            <a href="#produkty" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Fitness výbava</a>
-                            <a href="#produkty" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Sluchátka</a>
-                            <a href="#produkty" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Doplňky stravy</a>
-                            <a href="#produkty" class="block px-4 py-3 text-sm text-gray-300 hover:bg-[#00E5FF] hover:text-gray-900 transition-colors">Příslušenství</a>
-                        </div>
+                            <a href="#" onclick="zobrazKatalog(); return false;" class="block px-4 py-3 text-sm text-gray-300 hover:text-cyan-400 hover:bg-[#12151b] transition-colors">Fitness výbava</a>
+                            <a href="#" onclick="zobrazKatalog(); return false;" class="block px-4 py-3 text-sm text-gray-300 hover:text-cyan-400 hover:bg-[#12151b] transition-colors">Sluchátka</a>
+                            <a href="#" onclick="zobrazKatalog(); return false;" class="block px-4 py-3 text-sm text-gray-300 hover:text-cyan-400 hover:bg-[#12151b] transition-colors">Doplňky stravy</a>
+                            <a href="#" onclick="zobrazKatalog(); return false;" class="block px-4 py-3 text-sm text-gray-300 hover:text-cyan-400 hover:bg-[#12151b] transition-colors">Příslušenství</a>
                     </div>
                     
-                    <a href="#kontakt-stranka" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Kontakt</a>
+                   <a href="#" onclick="zobrazHlavni('kontakt'); return false;" class="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Kontakt</a>
                 </div>
 
                 <!-- Ikony a akce -->
@@ -163,6 +162,7 @@
         </div>
     </nav>
 
+    <div id="hlavni-obsah">
     <!-- Úvodní sekce (Full-screen) -->
     <section class="min-h-screen flex flex-col justify-center items-center text-center px-4 pt-20 bg-gradient-to-b from-[#0f1115] to-[#161920]">
         <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
@@ -180,8 +180,80 @@
             </a>
         </div>
     </section>
+</div>
+    <!-- === NOVÁ SEKCE: KATALOG PRODUKTŮ === -->
+<section id="katalog-produktu" class="hidden min-h-screen pt-24 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    <h1 class="text-3xl font-bold text-white mb-8">Kategorie produktů</h1>
 
-    <!-- SEKCEMOJE OBJEDNÁVKY (NOVÁ SAMOSTATNÁ LIŠTA/STRÁNKA) -->
+    <!-- 4 Kolonky kategorií -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+        <div class="flex flex-col items-center justify-center p-6 bg-[#12151b] border border-gray-800 rounded-xl hover:border-cyan-400 transition-all cursor-pointer group">
+            <i class="fa-solid fa-dumbbell text-4xl text-gray-500 group-hover:text-cyan-400 mb-4 transition-colors"></i>
+            <span class="font-semibold text-sm md:text-base">Fitness výbava</span>
+        </div>
+        <div class="flex flex-col items-center justify-center p-6 bg-[#12151b] border border-gray-800 rounded-xl hover:border-cyan-400 transition-all cursor-pointer group">
+            <i class="fa-solid fa-headphones text-4xl text-gray-500 group-hover:text-cyan-400 mb-4 transition-colors"></i>
+            <span class="font-semibold text-sm md:text-base">Sluchátka</span>
+        </div>
+        <div class="flex flex-col items-center justify-center p-6 bg-[#12151b] border border-gray-800 rounded-xl hover:border-cyan-400 transition-all cursor-pointer group">
+            <i class="fa-solid fa-jar text-4xl text-gray-500 group-hover:text-cyan-400 mb-4 transition-colors"></i>
+            <span class="font-semibold text-sm md:text-base">Doplňky stravy</span>
+        </div>
+        <div class="flex flex-col items-center justify-center p-6 bg-[#12151b] border border-gray-800 rounded-xl hover:border-cyan-400 transition-all cursor-pointer group">
+            <i class="fa-solid fa-stopwatch text-4xl text-gray-500 group-hover:text-cyan-400 mb-4 transition-colors"></i>
+            <span class="font-semibold text-sm md:text-base">Příslušenství</span>
+        </div>
+    </div>
+
+    <!-- Řádkový výpis produktů (Nejžádanější) -->
+    <h2 class="text-2xl font-bold text-white mb-6">Nejžádanější produkty</h2>
+    <div class="flex flex-col gap-4 mb-16">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-[#12151b] border border-gray-800 rounded-xl hover:border-gray-600 transition-all">
+            <div class="flex items-center gap-4 mb-4 sm:mb-0">
+                <div class="w-16 h-16 bg-[#1a1d24] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-dumbbell text-2xl text-gray-400"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-cyan-400 font-semibold uppercase tracking-wider">Fitness výbava</span>
+                    <h3 class="text-lg font-bold text-white mt-1">Nastavitelné činky 24kg</h3>
+                </div>
+            </div>
+            <div class="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+                <span class="text-2xl font-bold text-white">4 990 Kč</span>
+                <!-- ZDE BUDE NAPOJENO TVÉ PŮVODNÍ addToCart TLAČÍTKO -->
+                <button class="bg-cyan-500 hover:bg-cyan-400 text-gray-900 font-bold py-2.5 px-5 rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-cart-plus"></i> Koupit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kompletní nabídka (Grid) -->
+    <h2 class="text-2xl font-bold text-white mb-6">Kompletní nabídka</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Produkt: Masážní válec -->
+        <div class="bg-[#12151b] border border-gray-800 rounded-xl p-6 flex flex-col hover:border-gray-600 transition-all group">
+            <div class="h-40 flex items-center justify-center mb-6 bg-[#1a1d24] rounded-lg">
+                <i class="fa-solid fa-roller text-6xl text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
+            </div>
+            <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2">Fitness výbava</span>
+            <h3 class="text-lg font-bold text-white mb-4 flex-grow">Masážní válec Ergo</h3>
+            <div class="flex justify-between items-end mt-auto">
+                <div>
+                    <span class="block text-2xl font-bold text-white">450 Kč</span>
+                </div>
+                <button class="bg-[#1a1d24] hover:bg-cyan-500 text-white hover:text-gray-900 w-10 h-10 rounded-lg flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</section>
+    
+    <!-- SEKCE MOJE OBJEDNÁVKY (NOVÁ SAMOSTATNÁ LIŠTA/STRÁNKA) -->
 <section id="moje-objednavky" class="hidden min-h-screen py-12 bg-[#0b0f14] text-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6">
         <!-- Hlavička sekce -->
@@ -2452,5 +2524,27 @@ document.querySelectorAll('input[name="shipping_method"], input[name="payment_me
         </div>
     </div>
 </div>
+    
+function zobrazKatalog() {
+    document.getElementById('hlavni-obsah')?.classList.add('hidden');
+    document.getElementById('moje-objednavky')?.classList.add('hidden');
+    document.getElementById('katalog-produktu')?.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function zobrazHlavni(sekceId = null) {
+    document.getElementById('katalog-produktu')?.classList.add('hidden');
+    document.getElementById('moje-objednavky')?.classList.add('hidden');
+    document.getElementById('hlavni-obsah')?.classList.remove('hidden');
+    
+    if (sekceId) {
+        setTimeout(() => {
+            const element = document.getElementById(sekceId);
+            if(element) element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
 </body>
 </html> 
