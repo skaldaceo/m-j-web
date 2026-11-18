@@ -1485,7 +1485,7 @@ function applyDiscountCoupon() {
 
     const code = input.value.trim().toUpperCase();
     if (code === 'SIMPLE5') {
-        appliedDiscount = 0.5; // 5% sleva
+        appliedDiscount = 0.05; // 5% sleva
         msg.textContent = '✓ Kupón uplatněn! Získáváte slevu 5 %.';
         msg.className = 'text-xs mt-2 text-emerald-400 font-semibold';
     } else if (code.length > 0) {
