@@ -211,7 +211,7 @@
                                         <li class="space-y-1">
                                             <span>Balík odešlete na adresu našeho reklamačního oddělení:</span>
                                             <div class="mt-2 ml-4 p-3.5 bg-[#161920] border border-gray-800 rounded-lg text-cyan-300 font-semibold leading-snug shadow-inner space-y-0.5">
-                                                <p class="text-white">SimpleFit Gear s.r.o</p>
+                                                <p class="text-white">SimpleFit s.r.o</p>
                                                 <p class="text-gray-300 font-medium">Reklamační oddělení</p>
                                                 <p>Sulanského 695/4</p>
                                                 <p>Praha 11 - Háje</p>
@@ -273,9 +273,12 @@
                         placeholder="Např. Kettlebell 16kg, originální balení, ochranný obal..."></textarea>
                 </div>
 
+                <!-- Submit Error Message -->
+                <p id="submit-error-text" class="hidden text-sm text-red-400 text-center font-medium"></p>
+
                 <!-- Submit Button -->
                 <div class="pt-4">
-                    <button type="submit" id="submit-btn" class="w-full py-4 bg-[#00E5FF] hover:bg-cyan-400 text-gray-950 font-extrabold text-lg rounded-xl shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_25px_rgba(0,229,255,0.5)] focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all transform hover:-translate-y-0.5">
+                    <button type="submit" id="submit-btn" class="w-full py-4 bg-[#00E5FF] hover:bg-cyan-400 text-gray-950 font-extrabold text-lg rounded-xl shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_25px_rgba(0,229,255,0.5)] focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed">
                         Odeslat formulář
                     </button>
                 </div>
@@ -283,12 +286,27 @@
         </div>
 
         <!-- Success Message Container -->
-        <div id="success-message" class="hidden p-10 text-center fade-in">
+        <div id="success-message" class="hidden p-8 sm:p-10 text-center fade-in">
             <div class="w-20 h-20 bg-cyan-950/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-cyan-400/40 shadow-[0_0_30px_rgba(0,229,255,0.2)]">
                 <i class="fa-solid fa-check text-4xl text-cyan-400"></i>
             </div>
-            <h2 class="text-3xl font-bold text-white mb-3">Úspěšně odesláno</h2>
-            <p class="text-gray-400 mb-8 leading-relaxed max-w-md mx-auto">Děkujeme za vyplnění formuláře pro SimpleFit - GEAR. Na váš e-mail jsme zaslali potvrzení a instrukce k dalšímu postupu.</p>
+            <h2 class="text-3xl font-bold text-white mb-2">Úspěšně odesláno</h2>
+            <p class="text-gray-400 mb-6 leading-relaxed max-w-md mx-auto">Děkujeme za vyplnění formuláře pro SimpleFit - GEAR. Vaše žádost byla zaevidována pod následujícím číslem požadavku:</p>
+            
+            <!-- Generated RA Code Box -->
+            <div class="max-w-xs mx-auto mb-8 bg-[#0b0c10] border border-cyan-500/50 rounded-xl p-4 shadow-[0_0_20px_rgba(0,229,255,0.12)]">
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Číslo požadavku (RA kód)</p>
+                <div class="flex items-center justify-center space-x-3">
+                    <span id="generated-ra-code" class="text-2xl font-extrabold text-[#00E5FF] tracking-wider">RA-2026-0000</span>
+                    <button type="button" id="copy-ra-btn" title="Zkopírovat RA kód" class="text-gray-400 hover:text-cyan-400 p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                        <i class="fa-regular fa-copy text-lg"></i>
+                    </button>
+                </div>
+                <p id="copy-feedback" class="hidden text-[11px] text-cyan-400 mt-1">Zkopírováno do schránky!</p>
+            </div>
+
+            <p class="text-xs text-gray-500 mb-8 max-w-md mx-auto">Tento RA kód prosím přiložte do balíku nebo uveďte při osobním předání na výdejně.</p>
+
             <button onclick="resetForm()" class="px-8 py-3 bg-transparent border-2 border-cyan-400 text-cyan-400 font-bold rounded-xl hover:bg-cyan-950/40 focus:outline-none focus:ring-4 focus:ring-cyan-500/30 transition-all">
                 Zpět na formulář
             </button>
@@ -302,6 +320,9 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_OBjCg-l66656Z0CLFqQ7jw_4QoqgaZB';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Globální proměnná pro uložení aktuálně nalezené objednávky
+        let currentMatchedOrder = null;
+
         document.addEventListener('DOMContentLoaded', () => {
             const orderInput = document.getElementById('order_number');
             const orderLoading = document.getElementById('order-loading');
@@ -314,6 +335,11 @@
             const form = document.getElementById('return-form');
             const formContainer = document.getElementById('form-container');
             const successMessage = document.getElementById('success-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitErrorText = document.getElementById('submit-error-text');
+            const generatedRaCodeEl = document.getElementById('generated-ra-code');
+            const copyRaBtn = document.getElementById('copy-ra-btn');
+            const copyFeedback = document.getElementById('copy-feedback');
 
             const returnMethodRadios = document.querySelectorAll('input[name="return_method"]');
             const personalDeliveryInfo = document.getElementById('personal-delivery-info');
@@ -387,15 +413,15 @@
                 });
             }
 
-            // Načtení objednávky ze Supabase podle ID (např. #d254c516 nebo d254c516-...)
+            // Načtení objednávky ze Supabase podle ID (např. #d254c516)
             let debounceTimer;
             orderInput.addEventListener('input', (e) => {
-                // Odstranění mřížky '#' a mezer
                 const cleanedOrderNum = e.target.value.trim().replace(/^#/, '').toLowerCase();
                 
                 clearTimeout(debounceTimer);
                 orderErrorText.classList.add('hidden');
                 productSelectionError.classList.add('hidden');
+                currentMatchedOrder = null;
 
                 if (cleanedOrderNum.length < 4) {
                     orderProductsContainer.classList.add('hidden');
@@ -412,7 +438,6 @@
 
             async function fetchOrderFromSupabase(searchQuery) {
                 try {
-                    // Načteme objednávky z tabulky orders a najdeme shodu podle začátku UUID (id)
                     const { data: orders, error } = await supabaseClient
                         .from('orders')
                         .select('*');
@@ -427,7 +452,6 @@
                         return;
                     }
 
-                    // Najde objednávku, jejíž id začíná zadaným řetězcem (např. d254c516)
                     const matchedOrder = (orders || []).find(order => 
                         order.id && order.id.toLowerCase().startsWith(searchQuery)
                     );
@@ -439,6 +463,8 @@
                         return;
                     }
 
+                    currentMatchedOrder = matchedOrder;
+
                     const shortId = '#' + matchedOrder.id.slice(0, 8);
                     const formattedDate = matchedOrder.created_at 
                         ? new Date(matchedOrder.created_at).toLocaleDateString('cs-CZ') 
@@ -446,7 +472,6 @@
                     
                     orderMetaInfo.textContent = `Objednávka ${shortId}${formattedDate ? ' • Vytvořeno: ' + formattedDate : ''}`;
 
-                    // Automatická detekce sloupce s produkty (items, products, cart, order_items, zbozi...)
                     let rawItems = matchedOrder.items 
                         || matchedOrder.products 
                         || matchedOrder.cart 
@@ -454,7 +479,6 @@
                         || matchedOrder.zbozi 
                         || [];
 
-                    // Pokud je to v DB uložené jako JSON text, naparsujeme ho
                     if (typeof rawItems === 'string') {
                         try {
                             rawItems = JSON.parse(rawItems);
@@ -463,7 +487,6 @@
                         }
                     }
 
-                    // Záložní detekce: kdyby se sloupec jmenoval jinak, najdeme první pole objektů v řádku
                     if (!Array.isArray(rawItems) || rawItems.length === 0) {
                         for (const key of Object.keys(matchedOrder)) {
                             let val = matchedOrder[key];
@@ -513,7 +536,7 @@
                     
                     label.innerHTML = `
                         <div class="flex items-center space-x-3.5">
-                            <input type="checkbox" name="selected_products" value="${productName}${variantText}" data-product-id="${itemId}"
+                            <input type="checkbox" name="selected_products" value="${productName}${variantText}" data-qty="${quantity}" data-product-id="${itemId}"
                                 class="w-5 h-5 rounded text-cyan-500 bg-gray-900 border-gray-600 focus:ring-cyan-500 focus:ring-offset-gray-900 cursor-pointer">
                             <div>
                                 <p class="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">${productName}${variantText}</p>
@@ -536,21 +559,96 @@
                 });
             }
 
-            // Odeslání formuláře
+            // Generátor unikátního RA kódu (např. RA-2026-4829)
+            function generateRaCode() {
+                const year = new Date().getFullYear();
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
+                return `RA-${year}-${randomNum}`;
+            }
+
+            // Kopírování RA kódu do schránky
+            if (copyRaBtn) {
+                copyRaBtn.addEventListener('click', () => {
+                    const code = generatedRaCodeEl.textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        copyFeedback.classList.remove('hidden');
+                        setTimeout(() => copyFeedback.classList.add('hidden'), 2500);
+                    });
+                });
+            }
+
+            // Odeslání formuláře a uložení do Supabase tabulky `returns`
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                submitErrorText.classList.add('hidden');
 
-                const checkedProducts = Array.from(document.querySelectorAll('input[name="selected_products"]:checked'))
-                    .map(cb => cb.value);
+                if (!currentMatchedOrder) {
+                    orderErrorText.textContent = 'Zadejte prosím platné číslo existující objednávky.';
+                    orderErrorText.classList.remove('hidden');
+                    orderInput.focus();
+                    return;
+                }
 
-                if (!orderProductsContainer.classList.contains('hidden') && checkedProducts.length === 0) {
+                const checkedCheckboxes = Array.from(document.querySelectorAll('input[name="selected_products"]:checked'));
+                if (checkedCheckboxes.length === 0) {
                     productSelectionError.classList.remove('hidden');
                     orderProductsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
 
-                formContainer.classList.add('hidden');
-                successMessage.classList.remove('hidden');
+                const selectedProducts = checkedCheckboxes.map(cb => ({
+                    name: cb.value,
+                    quantity: Number(cb.dataset.qty) || 1
+                }));
+
+                const raCode = generateRaCode();
+                const shortOrderId = '#' + currentMatchedOrder.id.slice(0, 8);
+                const returnMethod = document.querySelector('input[name="return_method"]:checked')?.value;
+                const returnReason = document.querySelector('input[name="return_reason"]:checked')?.value;
+                const reasonDesc = document.getElementById('reason_desc').value.trim();
+                const itemsList = document.getElementById('items_list').value.trim();
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Odesílám požadavek...';
+
+                try {
+                    const { error } = await supabaseClient
+                        .from('returns')
+                        .insert([{
+                            ra_code: raCode,
+                            order_id: currentMatchedOrder.id,
+                            order_short_id: shortOrderId,
+                            customer_name: currentMatchedOrder.customer_name || null,
+                            customer_email: currentMatchedOrder.customer_email || null,
+                            selected_products: selectedProducts,
+                            return_method: returnMethod,
+                            return_reason: returnReason,
+                            reason_desc: reasonDesc,
+                            items_list: itemsList
+                        }]);
+
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Odeslat formulář';
+
+                    if (error) {
+                        console.error('Chyba při ukládání reklamace:', error);
+                        submitErrorText.textContent = 'Nepodařilo se uložit požadavek. Zkuste to prosím znovu.';
+                        submitErrorText.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Zobrazení vygenerovaného RA kódu na děkovné obrazovce
+                    generatedRaCodeEl.textContent = raCode;
+                    formContainer.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+
+                } catch (err) {
+                    console.error('Neočekávaná chyba:', err);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Odeslat formulář';
+                    submitErrorText.textContent = 'Chyba připojení k serveru. Zkuste to prosím znovu.';
+                    submitErrorText.classList.remove('hidden');
+                }
             });
         });
 
@@ -561,14 +659,17 @@
             const orderProductsContainer = document.getElementById('order-products-container');
             const orderErrorText = document.getElementById('order-error-text');
             const productSelectionError = document.getElementById('product-selection-error');
+            const submitErrorText = document.getElementById('submit-error-text');
             const personalDeliveryInfo = document.getElementById('personal-delivery-info');
             const zasilkovnaDeliveryInfo = document.getElementById('zasilkovna-delivery-info');
             const carrierDeliveryInfo = document.getElementById('carrier-delivery-info');
             
+            currentMatchedOrder = null;
             form.reset();
             orderProductsContainer.classList.add('hidden');
             orderErrorText.classList.add('hidden');
             productSelectionError.classList.add('hidden');
+            submitErrorText.classList.add('hidden');
             personalDeliveryInfo.classList.add('hidden');
             zasilkovnaDeliveryInfo.classList.add('hidden');
             carrierDeliveryInfo.classList.add('hidden');
