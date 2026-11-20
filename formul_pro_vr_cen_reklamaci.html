@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
@@ -28,15 +28,12 @@
         
         <!-- Header with SimpleFit - GEAR Branding -->
         <div class="px-6 py-8 sm:py-10 border-b border-gray-800 flex flex-col items-center text-center bg-[#13151a]">
-            <!-- Custom Logo Image -->
             <img src="logo.jpg" alt="SimpleFit - GEAR Logo" class="max-h-20 max-w-[240px] mb-4 object-contain drop-shadow-[0_0_15px_rgba(0,229,255,0.3)]" onerror="this.style.display='none'">
             
-            <!-- Brand Name Typography -->
             <div class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2">
                 <span class="text-white font-sans">Simple</span><span class="text-[#00E5FF] font-sans drop-shadow-[0_0_12px_rgba(0,229,255,0.4)]">Fit</span>
             </div>
             
-            <!-- GEAR Sub-brand with flanking lines -->
             <div class="flex items-center justify-center space-x-3 text-gray-300 text-sm sm:text-base tracking-[0.45em] uppercase font-light mb-6 w-full max-w-xs">
                 <span class="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gray-500 to-gray-300"></span>
                 <span class="px-1 text-gray-200 font-medium">GEAR</span>
@@ -59,7 +56,6 @@
                         <input type="text" id="order_number" name="order_number" required
                             class="w-full px-4 py-3 bg-[#0b0c10] border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all shadow-inner"
                             placeholder="Např. #d254c516">
-                        <!-- Loading Spinner -->
                         <div id="order-loading" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400">
                             <i class="fa-solid fa-circle-notch fa-spin text-lg"></i>
                         </div>
@@ -78,10 +74,7 @@
                         <span class="text-xs text-gray-400 bg-[#161920] px-2.5 py-1 rounded-md border border-gray-800">Vyberte položky</span>
                     </div>
 
-                    <!-- Dynamic Product List -->
-                    <div id="products-list" class="space-y-2.5">
-                        <!-- Položky se vloží dynamicky přes JS -->
-                    </div>
+                    <div id="products-list" class="space-y-2.5"></div>
                     <p id="product-selection-error" class="hidden text-xs text-red-400 font-medium">Vyberte prosím alespoň jeden produkt k vrácení nebo reklamaci.</p>
                 </div>
 
@@ -102,7 +95,6 @@
                                 </button>
                             </label>
 
-                            <!-- Personal Delivery Info Box -->
                             <div id="personal-delivery-info" class="hidden fade-in mt-2 bg-[#0b0c10] border border-cyan-900/60 rounded-xl p-4 space-y-3">
                                 <div class="flex items-start space-x-3">
                                     <i class="fa-solid fa-location-dot text-cyan-400 text-lg mt-1 flex-shrink-0"></i>
@@ -147,7 +139,6 @@
                                 </button>
                             </label>
 
-                            <!-- Zásilkovna Info Box -->
                             <div id="zasilkovna-delivery-info" class="hidden fade-in mt-2 bg-[#0b0c10] border border-cyan-900/60 rounded-xl p-4 sm:p-5 space-y-4">
                                 <div class="space-y-3 text-sm leading-relaxed">
                                     <p class="text-white font-medium">Pokud je pro vás pohodlnější odevzdat zásilku na výdejním místě, můžete využít Zásilkovnu:</p>
@@ -200,7 +191,6 @@
                                 </button>
                             </label>
 
-                            <!-- Carrier Info Box -->
                             <div id="carrier-delivery-info" class="hidden fade-in mt-2 bg-[#0b0c10] border border-cyan-900/60 rounded-xl p-4 sm:p-5 space-y-4">
                                 <div class="space-y-3 text-sm leading-relaxed">
                                     <p class="text-white font-medium">Pokud chcete reklamaci vyřídit co nejrychleji, můžete zboží zaslat přepravní službou dle vlastního výběru.</p>
@@ -291,7 +281,7 @@
                 <i class="fa-solid fa-check text-4xl text-cyan-400"></i>
             </div>
             <h2 class="text-3xl font-bold text-white mb-2">Úspěšně odesláno</h2>
-            <p class="text-gray-400 mb-6 leading-relaxed max-w-md mx-auto">Děkujeme za vyplnění formuláře pro SimpleFit - GEAR. Vaše žádost byla zaevidována pod následujícím číslem požadavku:</p>
+            <p class="text-gray-400 mb-6 leading-relaxed max-w-md mx-auto">Děkujeme za vyplnění formuláře pro SimpleFit - GEAR. Vaše žádost byla uložena do přehledu reklamací pod následujícím kódem:</p>
             
             <!-- Generated RA Code Box -->
             <div class="max-w-xs mx-auto mb-8 bg-[#0b0c10] border border-cyan-500/50 rounded-xl p-4 shadow-[0_0_20px_rgba(0,229,255,0.12)]">
@@ -305,22 +295,26 @@
                 <p id="copy-feedback" class="hidden text-[11px] text-cyan-400 mt-1">Zkopírováno do schránky!</p>
             </div>
 
-            <p class="text-xs text-gray-500 mb-8 max-w-md mx-auto">Tento RA kód prosím přiložte do balíku nebo uveďte při osobním předání na výdejně.</p>
+            <p class="text-xs text-gray-500 mb-8 max-w-md mx-auto">Stav své reklamace můžete kdykoliv sledovat ve svém profilu v sekci <strong class="text-gray-300">Reklamace / Servis</strong>.</p>
 
-            <button onclick="resetForm()" class="px-8 py-3 bg-transparent border-2 border-cyan-400 text-cyan-400 font-bold rounded-xl hover:bg-cyan-950/40 focus:outline-none focus:ring-4 focus:ring-cyan-500/30 transition-all">
-                Zpět na formulář
-            </button>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="index.html" class="w-full sm:w-auto px-8 py-3.5 bg-[#00E5FF] hover:bg-cyan-400 text-gray-950 font-extrabold rounded-xl shadow-[0_0_20px_rgba(0,229,255,0.25)] transition-all inline-flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                    <span>Zpět na hlavní stránku</span>
+                </a>
+                <a href="reklamace.html" class="w-full sm:w-auto px-6 py-3.5 bg-transparent border border-gray-700 hover:border-cyan-400 text-gray-300 hover:text-cyan-400 font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2">
+                    <span>Přehled reklamací</span>
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
-        // Konfigurace Supabase
         const SUPABASE_URL = 'https://rtqujirvdyzkdmxzvvfa.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_OBjCg-l66656Z0CLFqQ7jw_4QoqgaZB';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Globální proměnná pro uložení aktuálně nalezené objednávky
         let currentMatchedOrder = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -354,34 +348,17 @@
             const carrierInfoToggleBtn = document.getElementById('carrier-info-toggle-btn');
             const carrierRadio = document.querySelector('input[name="return_method"][value="prepravce"]');
 
-            // Handle radio toggle
             returnMethodRadios.forEach(radio => {
                 radio.addEventListener('change', () => {
-                    if (radio.value === 'osobni') {
-                        personalDeliveryInfo.classList.remove('hidden');
-                        zasilkovnaDeliveryInfo.classList.add('hidden');
-                        carrierDeliveryInfo.classList.add('hidden');
-                    } else if (radio.value === 'zasilkovna') {
-                        zasilkovnaDeliveryInfo.classList.remove('hidden');
-                        personalDeliveryInfo.classList.add('hidden');
-                        carrierDeliveryInfo.classList.add('hidden');
-                    } else if (radio.value === 'prepravce') {
-                        carrierDeliveryInfo.classList.remove('hidden');
-                        personalDeliveryInfo.classList.add('hidden');
-                        zasilkovnaDeliveryInfo.classList.add('hidden');
-                    } else {
-                        personalDeliveryInfo.classList.add('hidden');
-                        zasilkovnaDeliveryInfo.classList.add('hidden');
-                        carrierDeliveryInfo.classList.add('hidden');
-                    }
+                    personalDeliveryInfo.classList.toggle('hidden', radio.value !== 'osobni');
+                    zasilkovnaDeliveryInfo.classList.toggle('hidden', radio.value !== 'zasilkovna');
+                    carrierDeliveryInfo.classList.toggle('hidden', radio.value !== 'prepravce');
                 });
             });
 
-            // Toggle info box via 'i' icon for personal delivery
             if (infoToggleBtn) {
                 infoToggleBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    e.preventDefault(); e.stopPropagation();
                     osobniRadio.checked = true;
                     personalDeliveryInfo.classList.toggle('hidden');
                     zasilkovnaDeliveryInfo.classList.add('hidden');
@@ -389,11 +366,9 @@
                 });
             }
 
-            // Toggle info box via 'i' icon for Zásilkovna
             if (zasilkovnaInfoToggleBtn) {
                 zasilkovnaInfoToggleBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    e.preventDefault(); e.stopPropagation();
                     zasilkovnaRadio.checked = true;
                     zasilkovnaDeliveryInfo.classList.toggle('hidden');
                     personalDeliveryInfo.classList.add('hidden');
@@ -401,11 +376,9 @@
                 });
             }
 
-            // Toggle info box via 'i' icon for Carrier
             if (carrierInfoToggleBtn) {
                 carrierInfoToggleBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    e.preventDefault(); e.stopPropagation();
                     carrierRadio.checked = true;
                     carrierDeliveryInfo.classList.toggle('hidden');
                     personalDeliveryInfo.classList.add('hidden');
@@ -413,7 +386,6 @@
                 });
             }
 
-            // Načtení objednávky ze Supabase podle ID (např. #d254c516)
             let debounceTimer;
             orderInput.addEventListener('input', (e) => {
                 const cleanedOrderNum = e.target.value.trim().replace(/^#/, '').toLowerCase();
@@ -445,7 +417,6 @@
                     orderLoading.classList.add('hidden');
 
                     if (error) {
-                        console.error('Supabase chyba:', error);
                         orderProductsContainer.classList.add('hidden');
                         orderErrorText.textContent = 'Chyba při načítání dat ze Supabase.';
                         orderErrorText.classList.remove('hidden');
@@ -480,11 +451,7 @@
                         || [];
 
                     if (typeof rawItems === 'string') {
-                        try {
-                            rawItems = JSON.parse(rawItems);
-                        } catch (e) {
-                            rawItems = [];
-                        }
+                        try { rawItems = JSON.parse(rawItems); } catch (e) { rawItems = []; }
                     }
 
                     if (!Array.isArray(rawItems) || rawItems.length === 0) {
@@ -511,7 +478,6 @@
                     orderProductsContainer.classList.remove('hidden');
 
                 } catch (err) {
-                    console.error('Chyba při komunikaci se Supabase:', err);
                     orderLoading.classList.add('hidden');
                     orderProductsContainer.classList.add('hidden');
                     orderErrorText.textContent = 'Nepodařilo se připojit k databázi objednávek.';
@@ -519,7 +485,6 @@
                 }
             }
 
-            // Vykreslení zaškrtávacích karet produktů
             function renderOrderProducts(items) {
                 productsList.innerHTML = '';
 
@@ -559,14 +524,12 @@
                 });
             }
 
-            // Generátor unikátního RA kódu (např. RA-2026-4829)
             function generateRaCode() {
                 const year = new Date().getFullYear();
                 const randomNum = Math.floor(1000 + Math.random() * 9000);
                 return `RA-${year}-${randomNum}`;
             }
 
-            // Kopírování RA kódu do schránky
             if (copyRaBtn) {
                 copyRaBtn.addEventListener('click', () => {
                     const code = generatedRaCodeEl.textContent;
@@ -577,7 +540,6 @@
                 });
             }
 
-            // Odeslání formuláře a uložení do Supabase tabulky `returns`
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 submitErrorText.classList.add('hidden');
@@ -631,19 +593,26 @@
                     submitBtn.textContent = 'Odeslat formulář';
 
                     if (error) {
-                        console.error('Chyba při ukládání reklamace:', error);
                         submitErrorText.textContent = 'Nepodařilo se uložit požadavek. Zkuste to prosím znovu.';
                         submitErrorText.classList.remove('hidden');
                         return;
                     }
 
-                    // Zobrazení vygenerovaného RA kódu na děkovné obrazovce
+                    // Uložení RA kódu a e-mailu do localStorage pro okamžité zobrazení v profilu
+                    const savedRaCodes = JSON.parse(localStorage.getItem('simplefit_ra_codes') || '[]');
+                    if (!savedRaCodes.includes(raCode)) {
+                        savedRaCodes.push(raCode);
+                        localStorage.setItem('simplefit_ra_codes', JSON.stringify(savedRaCodes));
+                    }
+                    if (currentMatchedOrder.customer_email) {
+                        localStorage.setItem('simplefit_user_email', currentMatchedOrder.customer_email);
+                    }
+
                     generatedRaCodeEl.textContent = raCode;
                     formContainer.classList.add('hidden');
                     successMessage.classList.remove('hidden');
 
                 } catch (err) {
-                    console.error('Neočekávaná chyba:', err);
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Odeslat formulář';
                     submitErrorText.textContent = 'Chyba připojení k serveru. Zkuste to prosím znovu.';
@@ -651,31 +620,6 @@
                 }
             });
         });
-
-        function resetForm() {
-            const form = document.getElementById('return-form');
-            const formContainer = document.getElementById('form-container');
-            const successMessage = document.getElementById('success-message');
-            const orderProductsContainer = document.getElementById('order-products-container');
-            const orderErrorText = document.getElementById('order-error-text');
-            const productSelectionError = document.getElementById('product-selection-error');
-            const submitErrorText = document.getElementById('submit-error-text');
-            const personalDeliveryInfo = document.getElementById('personal-delivery-info');
-            const zasilkovnaDeliveryInfo = document.getElementById('zasilkovna-delivery-info');
-            const carrierDeliveryInfo = document.getElementById('carrier-delivery-info');
-            
-            currentMatchedOrder = null;
-            form.reset();
-            orderProductsContainer.classList.add('hidden');
-            orderErrorText.classList.add('hidden');
-            productSelectionError.classList.add('hidden');
-            submitErrorText.classList.add('hidden');
-            personalDeliveryInfo.classList.add('hidden');
-            zasilkovnaDeliveryInfo.classList.add('hidden');
-            carrierDeliveryInfo.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            formContainer.classList.remove('hidden');
-        }
     </script>
 </body>
 </html>
