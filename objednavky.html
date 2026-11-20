@@ -49,7 +49,6 @@
     </footer>
 
     <script>
-        // Správná URL (vvfs na konci) a anon klíč z tvého index.html
         const SUPABASE_URL = 'https://rtqujirvdyzkdmxzvvfa.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_OBjCg-l66656Z0CLFqQ7jw_4QoqgaZB';
         
@@ -63,6 +62,42 @@
                 client = window.supabaseClient;
             }
             return client;
+        }
+
+        // Získá e-mail aktuálně přihlášeného uživatele (ze Supabase Auth nebo z localStorage)
+        async function getLoggedInUserEmail(db) {
+            // 1. Zkusíme aktivní relaci ze Supabase Auth
+            try {
+                const { data: { user } } = await db.auth.getUser();
+                if (user && user.email) {
+                    return user.email.trim().toLowerCase();
+                }
+            } catch (e) {}
+
+            // 2. Zkusíme projít uložené údaje o uživateli v localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const val = localStorage.getItem(key);
+                if (!val) continue;
+
+                // Pokud je přímo hodnota e-mail
+                if (val.includes('@') && !val.startsWith('{') && !val.startsWith('[')) {
+                    return val.trim().toLowerCase();
+                }
+
+                // Pokud je to JSON objekt přihlášeného uživatele (např. currentUser, user, sb-...-auth-token)
+                if (val.startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(val);
+                        const email = parsed?.email || parsed?.user?.email || parsed?.currentSession?.user?.email;
+                        if (email && typeof email === 'string' && email.includes('@')) {
+                            return email.trim().toLowerCase();
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            return '';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -79,6 +114,19 @@
                     throw new Error("Nepodařilo se připojit k Supabase.");
                 }
 
+                const currentUserEmail = await getLoggedInUserEmail(db);
+
+                if (!currentUserEmail) {
+                    container.innerHTML = `
+                        <div class="text-center py-12 bg-[#141921] border border-gray-800 rounded-2xl p-6">
+                            <i class="fa-solid fa-user-lock text-4xl text-gray-600 mb-3 block"></i>
+                            <h3 class="text-lg font-bold text-gray-300">Nejste přihlášeni</h3>
+                            <p class="text-xs text-gray-500 mt-1 mb-4">Pro zobrazení vašich objednávek se prosím nejprve přihlaste ke svému účtu.</p>
+                            <a href="index.html" class="inline-block px-5 py-2.5 bg-cyan-400 text-gray-950 font-bold text-xs rounded-xl">Přejít na hlavní stránku</a>
+                        </div>`;
+                    return;
+                }
+
                 // Načtení z tabulky orders
                 const { data: orders, error } = await db
                     .from('orders')
@@ -87,9 +135,9 @@
 
                 if (error) throw error;
 
-                // Vyfiltrování podle e-mailu m7skalicky
+                // Dynamické vyfiltrování podle e-mailu aktuálně přihlášeného uživatele
                 const userOrders = (orders || []).filter(o => 
-                    o.customer_email && o.customer_email.toLowerCase().includes('m7skalicky')
+                    o.customer_email && o.customer_email.trim().toLowerCase() === currentUserEmail
                 );
 
                 if (userOrders.length === 0) {
