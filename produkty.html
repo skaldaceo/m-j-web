@@ -1408,7 +1408,7 @@
             if (!input || !msg) return;
 
             const code = input.value.trim().toUpperCase();
-            if (code === 'SIMPLE10' || code === 'MIRONET10') {
+            if (code === 'SIMPLE10') {
                 appliedDiscount = 0.10;
                 msg.textContent = '✓ Kupón uplatněn! Získáváte slevu 10 %.';
                 msg.className = 'text-xs mt-2 text-emerald-400 font-semibold';
